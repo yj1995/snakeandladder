@@ -7,13 +7,13 @@ class Parent extends Component {
   render() {
     return (
       <div className='Parent'>
-        <Start />
-        {/* <BrowserRouter>
+        {/* <Start /> */}
+        <BrowserRouter>
           <Switch>
           <Route exact path='/' component={Start}/>
           <Route exact path='/Board' component={Board}/>
           </Switch>
-        </BrowserRouter> */}
+        </BrowserRouter>
       </div>
     )
   }
