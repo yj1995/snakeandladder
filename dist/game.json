@@ -1,0 +1,76 @@
+{
+    "board": {
+        "row": 10,
+        "col": 10,
+        "position": "absolute",
+        "Inty": 50,
+        "Intx": 250
+    },
+    "ladder": [
+        {
+            "start": 8,
+            "end": 53
+        },
+        {
+            "start": 20,
+            "end": 81
+        },
+        {
+            "start": 50,
+            "end": 95
+        },
+        {
+            "start": 43,
+            "end": 76
+        },
+        {
+            "start": 16,
+            "end": 63
+        },
+        {
+            "start": 79,
+            "end": 97
+        }
+    ],
+    "snake": [
+        {
+            "start": 36,
+            "end": 3
+        },
+        {
+            "start": 99,
+            "end": 9
+        },
+        {
+            "start": 93,
+            "end": 65
+        },
+        {
+            "start": 72,
+            "end": 14
+        },
+        {
+            "start": 62,
+            "end": 18
+        }
+    ],
+    "square": {
+        "size": 61,
+        "color1": "#4a752b",
+        "font1": "white",
+        "color2": "#87af3a",
+        "font2": "black"
+    },
+    "diceParent": {
+        "position": "absolute",
+        "Inty": 97,
+        "Intx": 90,
+        "faceColor": "#000000",
+        "dotColor": "#FFFFFF"
+    },
+    "Piece": {
+        "size": 30,
+        "Inty": 620,
+        "width": 232
+    }
+}
