@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run dev",
-    "build": "concurrently \"NODE_ENV=production node server.js\" \"webpack\"",
+    "build": "webpack",
     "dev": "webpack-dev-server",
-    "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+    "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html"
   },
   "keywords": [
     "react.js"
