@@ -52,18 +52,38 @@ class Board extends Component {
         for (let j = 0; j < json.board.col; j++) {
           x = j * json.square.size;
           if (j % 2 === 0) {
-            this.position[i].push({ x: x, y: y, color: json.square.color1, fontColor: json.square.font1 });
+            this.position[i].push({
+              x: x,
+              y: y,
+              color: json.square.color1,
+              fontColor: json.square.font1
+            });
           } else {
-            this.position[i].push({ x: x, y: y, color: json.square.color2, fontColor: json.square.font2 });
+            this.position[i].push({
+              x: x,
+              y: y,
+              color: json.square.color2,
+              fontColor: json.square.font2
+            });
           }
         }
       } else {
         for (let j = json.board.col - 1; j >= 0; j--) {
           x = j * json.square.size;
           if (j % 2 === 0) {
-            this.position[i].push({ x: x, y: y, color: json.square.color2, fontColor: json.square.font2 });
+            this.position[i].push({
+              x: x,
+              y: y,
+              color: json.square.color2,
+              fontColor: json.square.font2
+            });
           } else {
-            this.position[i].push({ x: x, y: y, color: json.square.color1, fontColor: json.square.font1 });
+            this.position[i].push({
+              x: x,
+              y: y,
+              color: json.square.color1,
+              fontColor: json.square.font1
+            });
           }
         }
       }
@@ -95,7 +115,12 @@ class Board extends Component {
   setPiece() {
     const arr = [];
     for (let i = 0; i < this.userData.data.length; i++) {
-      arr.push({ x: json.Piece.width - (json.Piece.size + ((json.Piece.size + 5) * i)), y: 620, scale: 1, position: 0 })
+      arr.push({
+        x: json.Piece.width - (json.Piece.size + ((json.Piece.size + 5) * i)),
+        y: json.Piece.Inty,
+        scale: 1,
+        position: 0
+      })
       this.sixCount[i] = 0;
       this.ladderClimb[i] = 0;
       this.snakeBite[i] = 0;
@@ -136,12 +161,8 @@ class Board extends Component {
     let currectValue = 0;
     let ladderPresent;
     let SnakePresent;
+    let sixBool = false;
     let path = [];
-    // if (ladderPresent) {
-    //   ++this.ladderClimb[this.playerChance];
-    // } else {
-    //   ++this.snakeBite[this.playerChance];
-    // }
     if (piece[this.playerChance].first) {
       if (this.rollValue === 6) {
         ++this.sixCount[this.playerChance]
@@ -165,25 +186,42 @@ class Board extends Component {
 
     square.forEach((val, index) => {
       square[index].forEach((val, index) => {
-        if (!piece[this.playerChance].first && this.rollValue === 6) {
-          // ++piece[this.playerChance].position;
-          // TweenMax.to(piece[this.playerChance], 2, { x: json.board.Intx + val.x + (json.square.size / 4), y: val.y + json.board.Inty + (json.square.size / 4), onUpdate: () => this.setState({ piece }) })
-          // piece[this.playerChance].position += this.rollValue;
+        if (!piece[this.playerChance].first && this.rollValue === 6 && val.row === 10 && val.point === 1) {
+          ++piece[this.playerChance].position;
+          sixBool = true;
+          TweenMax.to(piece[this.playerChance], 1.5,
+            {
+              ease: SteppedEase.config(1),
+              x: json.board.Intx + val.x + (json.square.size / 4),
+              y: val.y + json.board.Inty + (json.square.size / 4),
+              onUpdate: () => this.setState({ piece }),
+              onComplete: () => {
+                this.PlayerStatus(piece);
+                document.querySelector('.diceParent').style['pointer-events'] = 'auto';
+              }
+            })
           piece[this.playerChance].first = true;
           ++this.sixCount[this.playerChance];
         } else if (piece[this.playerChance].first && path.length) {
           TweenMax.to(piece[this.playerChance], 1.5, {
             ease: SteppedEase.config(path.length),
             bezier: { values: path },
-            onUpdate: () => this.setState({ piece }), onComplete: () => {
+            onUpdate: () => this.setState({ piece }),
+            onComplete: () => {
               piece[this.playerChance].position += this.rollValue;
               ladderPresent = _.find(json.ladder, obj => (obj.start === piece[this.playerChance].position));
               SnakePresent = _.find(json.snake, obj => (obj.start === piece[this.playerChance].position));
               if (ladderPresent || SnakePresent) {
                 (ladderPresent) ? this.ladder_snake_Present(ladderPresent.end, piece, 'ladder') : this.ladder_snake_Present(SnakePresent.end, piece, 'snake')
                 this.setState({ piece });
+                if (ladderPresent) {
+                  ++this.ladderClimb[this.playerChance]
+                } else {
+                  ++this.snakeBite[this.playerChance]
+                }
               } else {
                 this.PlayerStatus(piece);
+                document.querySelector('.diceParent').style['pointer-events'] = 'auto';
               }
             }
           })
@@ -191,8 +229,11 @@ class Board extends Component {
       })
     })
 
-    if (!ladderPresent && !SnakePresent && !path.length) {
-      this.PlayerStatus(piece);
+    if (!ladderPresent && !SnakePresent && !path.length && !sixBool) {
+      setTimeout(() => {
+        this.PlayerStatus(piece);
+        document.querySelector('.diceParent').style['pointer-events'] = 'auto';
+      }, 500)
     }
   }
   rollAll() {
@@ -220,10 +261,19 @@ class Board extends Component {
   ladder_snake_Present(latestPosition, piece, value) {
     piece[this.playerChance].position = latestPosition;
     const currectValue = _.find(this.square, obj => obj.props.id === latestPosition).props;
-    TweenMax.to(piece[this.playerChance], 2, { x: json.board.Intx + currectValue.x + (json.square.size / 4), y: currectValue.y + json.board.Inty + (json.square.size / 4), onUpdate: () => this.setState({ piece }), onComplete: () => this.PlayerStatus(piece, value === 'ladder' ? true : false) })
+    TweenMax.to(piece[this.playerChance], 1.5, {
+      x: json.board.Intx + currectValue.x + (json.square.size / 4),
+      y: currectValue.y + json.board.Inty + (json.square.size / 4),
+      onUpdate: () => this.setState({ piece }),
+      onComplete: () => {
+        this.PlayerStatus(piece, value === 'ladder' ? true : false)
+        document.querySelector('.diceParent').style['pointer-events'] = 'auto';
+      }
+    })
   }
   rollDoneCallback(num) {
     if (this.Bool) {
+      document.querySelector('.diceParent').style['pointer-events'] = 'none';
       this.rollValue = num;
       this.rollDice();
     }
