@@ -30,6 +30,7 @@ class Start extends Component {
     this.start = 'block';
   }
   getDetails() {
+    const pathName = window.location.pathname;
     const playerName = document.querySelectorAll('.playerName');
     const color = document.querySelectorAll('.Color');
     const completeDetails = [];
@@ -37,7 +38,7 @@ class Start extends Component {
     _.each(playerName, (obj, index) => completeDetails.push({ name: obj.value ? obj.value : `player_${index}`, inital: obj.value ? `${obj.value[0].toUpperCase()}_${index}` : `P_${index}` }));
     _.each(color, (obj, index) => completeDetails[index].color = obj.value != 'select the piece color' ? obj.value : 'black');
     this.props.history.push({
-      pathname: '/Board',
+      pathname: `${pathName}Board`,
       data: completeDetails // your data array of objects
     })
   }
@@ -61,7 +62,6 @@ class Start extends Component {
     return array;
   }
   render() {
-    const path = window.location.pathname
     return (
       <div className='startPage' style={{ position: 'absolute', width: 1028, textAlign: 'center' }}>
         <h1>Welcome To Game</h1>
@@ -73,7 +73,7 @@ class Start extends Component {
           {this.state.details}
         </div>
         <div style={{ marginTop: 10, display: this.go }}><button onClick={this.getValue}>GO</button></div>
-        <div style={{ marginTop: 10, display: this.start }}><button onClick={this.getDetails}><Link to={`${path}Board`}>START</Link></button></div>
+        <div style={{ marginTop: 10, display: this.start }}><button onClick={this.getDetails}>START</button></div>
       </div>
     )
   }
