@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Route, Link, BrowserRouter as Router } from 'react-router-dom'
 import { Option } from './Option';
-import { ENETUNREACH } from 'constants';
 
 class Start extends Component {
   constructor(props) {
@@ -62,6 +61,7 @@ class Start extends Component {
     return array;
   }
   render() {
+    const path = window.location.pathname
     return (
       <div className='startPage' style={{ position: 'absolute', width: 1028, textAlign: 'center' }}>
         <h1>Welcome To Game</h1>
@@ -73,7 +73,7 @@ class Start extends Component {
           {this.state.details}
         </div>
         <div style={{ marginTop: 10, display: this.go }}><button onClick={this.getValue}>GO</button></div>
-        <div style={{ marginTop: 10, display: this.start }}><button onClick={this.getDetails}>START</button></div>
+        <div style={{ marginTop: 10, display: this.start }}><button onClick={this.getDetails}><Link to={`${path}Board`}>START</Link></button></div>
       </div>
     )
   }
