@@ -12,7 +12,7 @@ class Parent extends Component {
         <BrowserRouter>
           <Switch>
             <Route exact path={path} component={Start} />
-            <Route exact path={`${path}Board`} component={Board} />
+            <Route exact path={path} component={Board} />
           </Switch>
         </BrowserRouter>
       </div>
