@@ -5,13 +5,14 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 class Parent extends Component {
   render() {
+    const path = window.location.pathname
     return (
       <div className='Parent'>
         {/* <Start /> */}
         <BrowserRouter>
           <Switch>
-          <Route exact path='/' component={Start}/>
-          <Route exact path='/Board' component={Board}/>
+            <Route exact path={path} component={Start} />
+            <Route exact path={`${path}Board`} component={Board} />
           </Switch>
         </BrowserRouter>
       </div>
