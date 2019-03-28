@@ -15,8 +15,12 @@ class Parent extends Component {
     const scaleX = window.innerWidth / 1250;
     const scaleY = window.innerHeight / 700;
 
-    if (width <= 1250 || height <= 700 || window.devicePixelRatio === 2 || window.devicePixelRatio === 3) {
+    if (width <= 1250 || height <= 700) {
       document.querySelector('.root').style.transform = `scale(${scaleX},${scaleX})`
+      document.querySelector('.root').style.width = `${width}px`;
+      document.querySelector('.root').style.height = `${height}px`;
+    } else if (window.devicePixelRatio === 2 || window.devicePixelRatio === 3) {
+      document.querySelector('.root').style.transform = `scale(1,1)`
       document.querySelector('.root').style.width = `${width}px`;
       document.querySelector('.root').style.height = `${height}px`;
     } else {

@@ -34,6 +34,7 @@ module.exports = {
     new CopyPlugin([
       { from: './src/App/game.json', to: './game.json' }
     ]),
+    require('autoprefixer'),
   ],
   devServer: {
     open: true,
