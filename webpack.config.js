@@ -32,8 +32,7 @@ module.exports = {
     new CleanWebpackPlugin('dist'),
     new HTMLWebpackPlugin(),
     new CopyPlugin([
-      { from: './src/App/game.json', to: './game.json' },
-      { from: './index.html', to: './index.html' },
+      { from: './src/App/game.json', to: './game.json' }
     ]),
   ],
   devServer: {
