@@ -55,7 +55,7 @@
         }
     ],
     "square": {
-        "size": 61,
+        "size": 66,
         "color1": "#4a752b",
         "font1": "white",
         "color2": "#87af3a",
@@ -63,14 +63,14 @@
     },
     "diceParent": {
         "position": "absolute",
-        "Inty": 97,
-        "Intx": 90,
+        "Inty": 500,
+        "Intx": 50,
         "faceColor": "#000000",
         "dotColor": "#FFFFFF"
     },
     "Piece": {
         "size": 30,
-        "Inty": 620,
+        "Inty": 664,
         "width": 232
     }
 }

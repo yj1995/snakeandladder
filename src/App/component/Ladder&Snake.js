@@ -21,7 +21,7 @@ class Ladder extends Component {
     render() {
         return (
             <React.Fragment>
-                <Line x0={this.arr[0].x + json.board.Intx + 30} y0={this.arr[0].y + json.board.Inty + 30} x1={this.arr[1].x + json.board.Intx + 30} y1={this.arr[1].y + json.board.Inty + 30} borderColor={this.props.id.split("_")[0] === 'ladder' ? 'black' : 'orange'} borderWidth={5} />
+                <Line x0={this.arr[0].x  + 30} y0={this.arr[0].y + 30} x1={this.arr[1].x + 30} y1={this.arr[1].y + 30} borderColor={this.props.id.split("_")[0] === 'ladder' ? 'black' : 'orange'} borderWidth={5} within={this.props.className} />
             </React.Fragment>
         )
     }
