@@ -2,7 +2,7 @@
 [click here to play](https://yj1995.github.io/snakeandladder/)
 
 ## Snake and Ladder
-The purpose is to make snake and ladder game in react-dom. How the game should be made which using any cnavas and create.js.
+The purpose is to make snake and ladder game in react-dom.
 
 ## Getting Started             
 To get started, clone this repo, cd into the new repo, and type:
