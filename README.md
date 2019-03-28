@@ -1,5 +1,5 @@
 # game
-[click here to play](https://github.com/yj1995/game/edit/master/README.md)
+[click here to play](https://yj1995.github.io/snakeandladder/)
 
 ## Snake and Ladder
 The purpose is to make snake and ladder game in react-dom. How the game should be made which using any cnavas and create.js.
