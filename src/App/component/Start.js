@@ -34,7 +34,7 @@ class Start extends Component {
     const color = document.querySelectorAll('.Color');
     const completeDetails = [];
     console.log()
-    _.each(playerName, (obj, index) => completeDetails.push({ name: obj.value ? obj.value.toUpperCase() : `PLAYER_${index}`, inital: obj.value ? `${obj.value[0].toUpperCase()} ${obj.value[1].toUpperCase()}` : `PL` }));
+    _.each(playerName, (obj, index) => completeDetails.push({ name: obj.value ? obj.value.toUpperCase() : `PLAYER_${index}`, inital: obj.value ? `${obj.value[0].toUpperCase()}${obj.value[1].toUpperCase()}` : `PL` }));
     _.each(color, (obj, index) => completeDetails[index].color = obj.value != 'select the piece color' ? obj.value : 'black');
     this.props.history.push({
       pathname: `${pathName}Board`,

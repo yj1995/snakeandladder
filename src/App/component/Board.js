@@ -272,15 +272,34 @@ class Board extends Component {
   findLadderAndSnakePresent(latestPosition, piece, value) {
     piece[this.playerChance].position = latestPosition;
     const currectValue = _.find(this.tile, obj => obj.props.id === latestPosition).props;
-    TweenMax.to(piece[this.playerChance], 1.5, {
-      x: currectValue.x + (json.square.size / 8.5),
-      y: currectValue.y + (json.square.size / 8.5),
-      onUpdate: () => this.setState({ piece }),
-      onComplete: () => {
-        this.currectPlayerStatus(piece, value === 'ladder' ? true : false)
-        document.querySelector('.diceParent').style['pointer-events'] = 'auto';
-      }
-    })
+    if (value === 'ladder') {
+      TweenMax.to(piece[this.playerChance], 1.5, {
+        x: currectValue.x + (json.square.size / 8.5),
+        y: currectValue.y + (json.square.size / 8.5),
+        onUpdate: () => this.setState({ piece }),
+        onComplete: () => {
+          this.currectPlayerStatus(piece, value === 'ladder' ? true : false)
+          document.querySelector('.diceParent').style['pointer-events'] = 'auto';
+        }
+      })
+    } else {
+      TweenMax.to(piece[this.playerChance], 1, {
+        scale: 0,
+        onUpdate: () => this.setState({ piece }),
+        onComplete: () => {
+          piece[this.playerChance].x = currectValue.x + (json.square.size / 8.5);
+          piece[this.playerChance].y = currectValue.y + (json.square.size / 8.5);
+          TweenMax.to(piece[this.playerChance], 1, {
+            scale: 1,
+            onUpdate: () => this.setState({ piece }),
+            onComplete: () => {
+              this.currectPlayerStatus(piece, value === 'ladder' ? true : false);
+              document.querySelector('.diceParent').style['pointer-events'] = 'auto';
+            }
+          })
+        }
+      })
+    }
   }
 
   render() {
