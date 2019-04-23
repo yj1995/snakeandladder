@@ -1,21 +1,16 @@
 import React, { Component } from 'react';
 import { Board } from './component/Board';
+import { Offline } from './component/Offline';
+import { Online } from './component/Online';
 import { Start } from './component/Start';
+import { CreateRoom } from './component/CreateRoom';
+import { JoinRoom } from './component/JoinRoom';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import openSocket from 'socket.io-client';
-import axios from 'axios';
 
 class Parent extends Component {
   constructor(props) {
     super(props)
-    window.display = this;
-    this.state = {
-      roomId: []
-    }
-    this.socket = openSocket('localhost:3000');
     this.handleResize = this.handleResize.bind(this);
-    this.createRoom = this.createRoom.bind(this);
-    this.getDataFromDb = this.getDataFromDb.bind(this);
   }
 
   handleResize() {
@@ -68,22 +63,19 @@ class Parent extends Component {
     }
   }
 
-  createRoom() {
-    const room = document.getElementById('room').value;
-    this.socket.emit('new-room', room);
-    this.getDataFromDb();
-  }
-
   render() {
-    const pathName = window.location.pathname
+    const pathName = window.location.pathname;
     return (
       <div className='Parent' style={{ position: 'absolute', width: '100%', height: '100%', background: '#63820C' }}>
         {/* <Start /> */}
-        <input id='room' /><button onClick={this.createRoom}>create</button>
         <BrowserRouter>
           <Switch>
-            <Route exact path={pathName} component={Start} />
-            <Route path={`${pathName}Board`} component={Board} />
+            <Route exact path={`${pathName}`} component={Start} />
+            <Route exact path={`${pathName}Online`} component={Online} />
+            <Route exact path={`${pathName}Offline`} component={Offline} />
+            <Route exact path={`${pathName}CreateRoom`} component={CreateRoom} />
+            <Route exact path={`${pathName}JoinRoom`} component={JoinRoom} />
+            <Route exact path={`${pathName}Board`} component={Board} />
           </Switch>
         </BrowserRouter>
       </div>
@@ -92,34 +84,11 @@ class Parent extends Component {
 
   componentDidMount() {
     this.handleResize()
-    window.addEventListener('resize', this.handleResize)
-    this.socket.on('created-room', (msg) => {
-      const roomId = this.state.roomId;
-      roomId.push(msg);
-      this.setState({
-        roomId
-      })
-    });
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize)
   }
-  getDataFromDb() {
-    const path = `${window.location.href}`
-    axios.get(path, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    })
-      .then(function (response) {
-        console.log(response.body);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
 }
 
-export { Parent }
+export { Parent };
