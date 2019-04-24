@@ -7,7 +7,6 @@ class Online extends Component {
     }
     roomTypeClick(e) {
         let pathName = window.location.pathname;
-        console.log(pathName);
         let split = pathName.split('/');
         let concate = '';
         split[split.length - 1] = '';
