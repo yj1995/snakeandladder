@@ -31,7 +31,15 @@ class Offline extends Component {
   }
   getDetails() {
     let pathName = window.location.pathname;
-    pathName = '/';
+    console.log(pathName);
+    let split = pathName.split('/');
+    let concate = '';
+    split[split.length - 1] = '';
+    console.log('sliptr', split);
+    for (let i = 0; i < split.length; i++) {
+      concate = concate.concat(split[i]);
+    }
+    pathName = concate;
     console.log(pathName);
     const playerName = document.querySelectorAll('.playerName');
     const color = document.querySelectorAll('.Color');

@@ -6,17 +6,25 @@ class Online extends Component {
         this.roomTypeClick = this.roomTypeClick.bind(this);
     }
     roomTypeClick(e) {
-        console.log('adshgdsahg');
         let pathName = window.location.pathname;
-        pathName = '/';
+        console.log(pathName);
+        let split = pathName.split('/');
+        let concate = '';
+        split[split.length - 1] = '';
+        console.log('sliptr', split);
+        for (let i = 0; i < split.length; i++) {
+            concate = concate.concat(split[i]);
+        }
+        pathName = concate;
+        console.log(pathName);
         const roomType = e.target.getAttribute('type');
         if (roomType === 'Create') {
             this.props.history.push({
-                pathname: `${pathName}CreateRoom`
+                pathname: `${pathName}/CreateRoom`
             })
         } else {
             this.props.history.push({
-                pathname: `${pathName}JoinRoom`
+                pathname: `${pathName}/JoinRoom`
             })
         }
     }

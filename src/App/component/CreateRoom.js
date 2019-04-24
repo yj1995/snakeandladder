@@ -53,7 +53,7 @@ class CreateRoom extends Component {
     render() {
         return (
             <div>
-                CreateRoom
+                ComingSoon
             </div>
         )
     }

@@ -54,7 +54,7 @@ class JoinRoom extends Component {
         console.log('sadgyugdsyag');
         return (
             <div>
-                JoinRoom
+               ComingSoon
             </div>
         )
     }
