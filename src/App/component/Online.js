@@ -7,14 +7,7 @@ class Online extends Component {
     }
     roomTypeClick(e) {
         let pathName = window.location.pathname;
-        let split = pathName.split('/');
-        let concate = '';
-        split[split.length - 1] = '';
-        console.log('sliptr', split);
-        for (let i = 0; i < split.length; i++) {
-            concate = concate.concat(split[i]);
-        }
-        pathName = concate;
+        pathName = '';
         console.log(pathName);
         const roomType = e.target.getAttribute('type');
         if (roomType === 'Create') {
