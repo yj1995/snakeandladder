@@ -8,15 +8,14 @@ class Online extends Component {
     roomTypeClick(e) {
         let pathName = window.location.pathname;
         pathName = '';
-        console.log(pathName);
         const roomType = e.target.getAttribute('type');
         if (roomType === 'Create') {
             this.props.history.push({
-                pathname: `${pathName}/CreateRoom`
+                pathname: `${pathName}CreateRoom`
             })
         } else {
             this.props.history.push({
-                pathname: `${pathName}/JoinRoom`
+                pathname: `${pathName}JoinRoom`
             })
         }
     }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import _ from 'lodash';
 import { Line } from 'react-lineto';
-import json from '../game.json'
 
 class Ladder extends Component {
     constructor(props) {

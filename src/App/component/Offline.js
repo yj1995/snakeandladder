@@ -32,6 +32,7 @@ class Offline extends Component {
   getDetails() {
     let pathName = window.location.pathname;
     pathName = '';
+    console.log(pathName);
     const playerName = document.querySelectorAll('.playerName');
     const color = document.querySelectorAll('.Color');
     const completeDetails = [];
