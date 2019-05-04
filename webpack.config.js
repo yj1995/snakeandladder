@@ -20,6 +20,24 @@ module.exports = {
         loader: "babel-loader"
       },
       {
+        test: /\.less$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              strictMath: true,
+              noIeCompat: true,
+            },
+          },
+        ],
+      },
+      {
         test: /\.css$/,
         use: [
           'style-loader',
