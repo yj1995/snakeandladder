@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Parent } from './Parent';
+import './component/style.less';
 
 const root = document.createElement('div');
 root.setAttribute('class', 'root');
