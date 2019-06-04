@@ -8,7 +8,7 @@
     "build": "webpack",
     "dev": "webpack-dev-server",
     "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build &&  concurrently --kill-others \"npm run serve\""
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build && concurrently --kill-others \"npm run serve\""
   },
   "keywords": [
     "react.js"
