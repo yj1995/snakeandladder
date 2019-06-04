@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import openSocket from 'socket.io-client';
 import axios from 'axios';
 
 class JoinRoom extends Component {
@@ -9,28 +8,12 @@ class JoinRoom extends Component {
             roomId: [],
             data: []
         }
-        this.socket = openSocket('localhost:3000');
-        this.createRoom = this.createRoom.bind(this);
+        this.mounted = true;
         this.getDataFromDb = this.getDataFromDb.bind(this);
+        this.JoinRoom = this.JoinRoom.bind(this);
+        this.updateData = this.updateData.bind(this);
     }
 
-    createRoom() {
-        const room = document.getElementById('room').value;
-        this.socket.emit('new-room', room);
-        this.getDataFromDb();
-    }
-
-    componentDidMount() {
-        window.addEventListener('resize', this.handleResize)
-        this.socket.on('created-room', (msg) => {
-            const roomId = this.state.roomId;
-            roomId.push(msg);
-            this.setState({
-                roomId
-            })
-        });
-        this.getDataFromDb();
-    }
     getDataFromDb() {
         axios.get('http://localhost:3000/', {
             headers: {
@@ -39,23 +22,69 @@ class JoinRoom extends Component {
             }
         })
             .then((response) => {
-                console.log(response)
-                let room = [];
-                _.each(response.data, (value) => {
-                    room.push(value.roomId);
-                })
-                this.setState({ data: response.data, roomId: room })
+                if (this.mounted) {
+                    let room = [];
+                    _.each(response.data, (value) => {
+                        room.push(value.roomId);
+                    })
+                    this.setState({ data: response.data, roomId: room })
+                }
             })
             .catch((error) => {
                 console.log(error);
             });
     }
+
+    existingRoom() {
+        let room = [];
+        _.forEach(this.state.data, data => room.push(<button key={`roomId_${data.roomId}`} disabled={data.status == "Matched" ? true : false} className='Room' onClick={this.JoinRoom} roomid={data.roomId} style={{ pointerEvents: (data.status == "Matched") ? "none" : null }}><div>RoomId: {data.roomId}</div><div>{data.CNOP} of {data.NOP} <span style={{ color: "red" }}>"{data.status}"</span></div></button>));
+        return room;
+    }
+
+    JoinRoom(e) {
+        const roomId = e.currentTarget.getAttribute('roomid');
+        let room = this.state.data;
+        let updateData = [];
+        updateData = _.find(room, data => { return data.roomId == roomId })
+        let { CNOP, NOP, status, ...value } = updateData;
+        if (CNOP < NOP) {
+            ++CNOP;
+            if (CNOP == NOP && status != "Matched") {
+                status = "Matched";
+            }
+        }
+        updateData = { CNOP, NOP, status, ...value };
+        this.updateData(updateData);
+    }
+
+    updateData(updateData) {
+        axios.post('http://localhost:3000/update', {
+            body: updateData
+        }).then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    componentDidUpdate() {
+        this.getDataFromDb();
+    }
+
+    componentDidMount() {
+        this.getDataFromDb();
+    }
+
+    componentWillUnmount() {
+        this.mounted = false;
+    }
     render() {
-        console.log('sadgyugdsyag');
         return (
-            <div>
-               ComingSoon
-            </div>
+            <React.Fragment>
+                <div className='JoinRoomParent'>
+                    <div className='JoinRoomBody'>Join Room</div>
+                    <div className='RoomHolder'>{this.existingRoom()}</div>
+                </div>
+            </React.Fragment>
         )
     }
 }

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const assert = require('assert');
-// const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const mongoose = require('mongoose');
-const url = 'mongodb+srv://yash:yash1995@snakeandladder-4nxaa.gcp.mongodb.net/game?retryWrites=true';
+const url = 'mongodb+srv://yash:yash1995@snakeandladder-4nxaa.gcp.mongodb.net/game?retryWrites=true&w=majority';
 const options = {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -24,7 +24,7 @@ router.get('/', (req, res, next) => {
     let resultArray = [];
     mongoose.connect(url, options, function (err, db) {
         assert.equal(null, err);
-        let cursor = db.collection('rooms').find();
+        let cursor = db.collection('room').find();
         cursor.forEach((doc, err) => {
             assert.equal(null, err);
             resultArray.push(doc);
@@ -38,12 +38,43 @@ router.get('/', (req, res, next) => {
 router.post('/newRoom', (req, res, next) => {
     mongoose.connect(url, options, function (err, db) {
         assert.equal(null, err);
-        let cursor = db.collection('rooms');
+        let cursor = db.collection('room');
         cursor.insertOne(req.body.body, (err, result) => {
             assert.equal(null, err);
-            res.send('Success');
+            res.send('insert');
             db.close();
         });
     })
 })
+
+router.post('/update', (req, res, next) => {
+    mongoose.connect(url, options, function (err, db) {
+        assert.equal(null, err);
+        let id = req.body.body.roomId;
+        let set = {
+            CNOP: req.body.body.CNOP,
+            status: req.body.body.status
+        };
+        let cursor = db.collection('room');
+        cursor.updateOne({ "roomId": id }, { $set: set }, (err, result) => {
+            assert.equal(null, err);
+            res.send('update');
+            db.close();
+        });
+    })
+})
+
+router.post('/delete', (req, res, next) => {
+    mongoose.connect(url, options, function (err, db) {
+        assert.equal(null, err);
+        let id = req.body.body.roomId;
+        let cursor = db.collection('room');
+        cursor.deleteOne({ "roomId": id }, (err, result) => {
+            assert.equal(null, err);
+            res.send('delete');
+            db.close();
+        });
+    })
+})
+
 module.exports = router;

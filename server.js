@@ -8,10 +8,10 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const router = require('./mongoRouting');
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use("/", router);
 app.use(logger("dev"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/", router);
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static('dist'));

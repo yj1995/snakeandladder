@@ -60,7 +60,6 @@ class CreateRoom extends Component {
     }
 
     componentDidMount() {
-        window.addEventListener('resize', this.handleResize)
         this.socket.on('created-room', (msg) => {
             const roomId = this.state.roomId;
             roomId.push(msg);
@@ -77,7 +76,6 @@ class CreateRoom extends Component {
                 'Accept': 'application/json'
             }
         }).then((response) => {
-            console.log(response);
             let room = [];
             _.each(response.data, (value) => {
                 room.push(value.roomId);
