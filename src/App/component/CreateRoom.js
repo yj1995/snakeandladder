@@ -11,9 +11,9 @@ class CreateRoom extends Component {
             data: [],
             button: []
         }
-        this.pathName = (window.location.pathname.split('/').length === 3) ? window.location.pathname : 'http://localhost:3000';
+        this.pathName = (window.location.pathname.split('/').length >= 3) ? window.location.pathname : 'http://localhost:3000';
         this.noOfPlayer = 0;
-        this.socket = openSocket('localhost:3000');
+        this.socket = openSocket(this.pathName);
         this.createRoom = this.createRoom.bind(this);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.createNoOfPlayerButton = this.createNoOfPlayerButton.bind(this);
