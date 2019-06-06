@@ -11,9 +11,8 @@ class CreateRoom extends Component {
             data: [],
             button: []
         }
-        this.pathName = (window.location.pathname.split('/').length >= 3) ? window.location.pathname : 'http://localhost:3000';
         this.noOfPlayer = 0;
-        this.socket = openSocket(this.pathName);
+        this.socket = openSocket('localhost:3000');
         this.createRoom = this.createRoom.bind(this);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.createNoOfPlayerButton = this.createNoOfPlayerButton.bind(this);
@@ -71,7 +70,7 @@ class CreateRoom extends Component {
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
-        axios.get(`${this.pathName}/`, {
+        axios.get('http://localhost:3000/', {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -91,7 +90,7 @@ class CreateRoom extends Component {
                 this.setState({ data: response.data, roomId: room })
                 this.postData(roomId);
             } else {
-                alert(`ALREADY USED ROOMID: ${roomId}.PLZ USE DIFFERENT ROOMID`);
+                alert(`ALREADY USED ROOMID:${roomId}. PLZ USE DIFFERENT ROOMID`);
                 document.getElementsByClassName('CreateRoomBodyInput')[0].value = '';
                 for (let i = 0; i < length; i++) {
                     document.querySelectorAll('.player')[i].style.background = 'white';
@@ -111,7 +110,7 @@ class CreateRoom extends Component {
             status: 'Matching',
             playerInfo: []
         }
-        axios.post(`${this.pathName}/newRoom`, {
+        axios.post('http://localhost:3000/newRoom', {
             body: data
         }).then((response) => {
             console.log(response);
