@@ -7,22 +7,23 @@ const bodyParser = require('body-parser');
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const router = require('./mongoRouting');
-app.use(cors());
-app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/", router);
 
 if (process.env.NODE_ENV === 'production') {
     app.disable("x-powered-by")
     app.use(logger("common"));
-    app.use(express.static(path.resolve(__dirname, '../../dist')));
+    app.use(express.static(path.resolve(__dirname, './dist')));
+    console.log(path.resolve(__dirname, './dist', 'index.html'));
     app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../../dist', 'index.html'));
+        res.sendFile(path.resolve(__dirname, './dist', 'index.html'));
     })
 }
 const port = process.env.PORT || 3000;
 http.listen(port, () => console.log(`Server started on port ${port}`));
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/", router);
 
 io.on('connection', function (socket) {
     socket.on('new-room', function (msg) {
