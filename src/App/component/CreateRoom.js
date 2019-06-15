@@ -28,6 +28,7 @@ class CreateRoom extends Component {
     }
 
     checkValidation(e) {
+        console.log('hiii');
         const id = e.target.getAttribute('id');
         const length = document.querySelectorAll('.player').length;
         const input = document.getElementsByClassName('CreateRoomBodyInput')[0];
