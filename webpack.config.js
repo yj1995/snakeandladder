@@ -1,15 +1,12 @@
 const path = require("path");
-const nodeExternals = require('webpack-node-externals');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    bundle: "./src/App"
+    bundle: "./src/App/index.js"
   },
-  target: 'node',
-  externals: [nodeExternals()],
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, 'dist'),
