@@ -28,6 +28,7 @@ class CreateRoom extends Component {
     }
 
     checkValidation(e) {
+        console.log('hiii');
         const id = e.target.getAttribute('id');
         const length = document.querySelectorAll('.player').length;
         const input = document.getElementsByClassName('CreateRoomBodyInput')[0];
@@ -70,7 +71,7 @@ class CreateRoom extends Component {
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
-        axios.get('http://localhost:3000/', {
+        axios.get('/', {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -110,7 +111,7 @@ class CreateRoom extends Component {
             status: 'Matching',
             playerInfo: []
         }
-        axios.post('http://localhost:3000/newRoom', {
+        axios.post('/newRoom', {
             body: data
         }).then((response) => {
             console.log(response);
