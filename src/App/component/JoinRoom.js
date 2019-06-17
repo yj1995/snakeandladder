@@ -10,7 +10,7 @@ class JoinRoom extends Component {
         }
         this.socketHost =
             window.location.hostname === "localhost"
-                ? "http://localhost:8080"
+                ? "http://localhost:3000"
                 : window.location.hostname;
         this.mounted = true;
         this.getDataFromDb = this.getDataFromDb.bind(this);
