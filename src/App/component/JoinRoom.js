@@ -8,14 +8,19 @@ class JoinRoom extends Component {
             roomId: [],
             data: []
         }
+        this.socketHost =
+            window.location.hostname === "localhost"
+                ? "http://localhost:8080"
+                : window.location.hostname;
         this.mounted = true;
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.JoinRoom = this.JoinRoom.bind(this);
         this.updateData = this.updateData.bind(this);
+        console.log(this.socketHost);
     }
 
     getDataFromDb() {
-        axios.get('http://localhost:3000/', {
+        axios.get(`${this.socketHost}/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -58,7 +63,7 @@ class JoinRoom extends Component {
     }
 
     updateData(updateData) {
-        axios.post('http://localhost:3000/update', {
+        axios.post(`${this.socketHost}/update`, {
             body: updateData
         }).then((response) => {
             console.log(response);

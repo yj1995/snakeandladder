@@ -12,7 +12,11 @@ class CreateRoom extends Component {
             button: []
         }
         this.noOfPlayer = 0;
-        this.socket = openSocket('localhost:3000');
+        this.socketHost =
+            window.location.hostname === "localhost"
+                ? "http://localhost:8080"
+                : window.location.hostname;
+        this.socket = openSocket(this.socketHost);
         this.createRoom = this.createRoom.bind(this);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.createNoOfPlayerButton = this.createNoOfPlayerButton.bind(this);
@@ -71,7 +75,7 @@ class CreateRoom extends Component {
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
-        axios.get('http://localhost:3000/', {
+        axios.get(`${this.socketHost}/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -111,7 +115,7 @@ class CreateRoom extends Component {
             status: 'Matching',
             playerInfo: []
         }
-        axios.post('http://localhost:3000/newRoom', {
+        axios.post(`${this.socketHost}/newRoom`, {
             body: data
         }).then((response) => {
             console.log(response);
