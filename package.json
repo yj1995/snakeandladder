@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"node server.js\" \"npm run dev\"",
+    "start": "concurrently \"node server\" \"npm run dev\"",
     "build": "webpack",
     "dev": "webpack-dev-server",
     "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build && NODE_ENV=production node server"
   },
   "proxy": "http://127.0.0.1:3000",
   "keywords": [

@@ -9,6 +9,7 @@ const io = require('socket.io')(http);
 const router = require('./mongoRouting');
 
 if (process.env.NODE_ENV === 'production') {
+    console.log('dsaygsdah');
     app.disable("x-powered-by")
     app.use(logger("common"));
     app.use(express.static(path.resolve(__dirname, './dist')));
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
         res.sendFile(path.resolve(__dirname, './dist', 'index.html'));
     })
 }
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 http.listen(port, () => console.log(`Server started on port ${port}`));
 
 app.use(cors());
