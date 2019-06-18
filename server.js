@@ -8,6 +8,11 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const router = require('./mongoRouting');
 
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/", router);
+
 if (process.env.NODE_ENV === 'production') {
     console.log('dsaygsdah');
     app.disable("x-powered-by")
@@ -20,11 +25,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 const port = process.env.PORT || 3000;
 http.listen(port, () => console.log(`Server started on port ${port}`));
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/", router);
 
 io.on('connection', function (socket) {
     socket.on('new-room', function (msg) {

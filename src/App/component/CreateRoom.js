@@ -14,7 +14,7 @@ class CreateRoom extends Component {
         this.noOfPlayer = 0;
         this.socketHost =
             window.location.hostname === "localhost"
-                ? "http://localhost:8080"
+                ? "http://localhost:3000"
                 : window.location.hostname;
         this.socket = openSocket(this.socketHost);
         this.createRoom = this.createRoom.bind(this);
