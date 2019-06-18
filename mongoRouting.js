@@ -19,12 +19,13 @@ const options = {
     family: 4 // Use IPv4, skip trying IPv6
 };
 // const client = new MongoClient(url, options);
-
+console.log('dsasadg');
 router.get('/', (req, res, next) => {
     let resultArray = [];
     mongoose.connect(url, options, function (err, db) {
         assert.equal(null, err);
         let cursor = db.collection('room').find();
+        console.log(cursor);
         cursor.forEach((doc, err) => {
             assert.equal(null, err);
             resultArray.push(doc);

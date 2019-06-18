@@ -20,7 +20,7 @@ class JoinRoom extends Component {
     }
 
     getDataFromDb() {
-        axios.get(`${this.socketHost}/`, {
+        axios.get(`/api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -63,7 +63,7 @@ class JoinRoom extends Component {
     }
 
     updateData(updateData) {
-        axios.post(`${this.socketHost}/update`, {
+        axios.post(`/api/update`, {
             body: updateData
         }).then((response) => {
             console.log(response);
@@ -71,9 +71,9 @@ class JoinRoom extends Component {
             console.log(error);
         });
     }
-    componentDidUpdate() {
-        this.getDataFromDb();
-    }
+    // componentDidUpdate() {
+    //     this.getDataFromDb();
+    // }
 
     componentDidMount() {
         this.getDataFromDb();

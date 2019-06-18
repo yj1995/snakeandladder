@@ -75,7 +75,7 @@ class CreateRoom extends Component {
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
-        axios.get(`${this.socketHost}/`, {
+        axios.get(`/api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -115,7 +115,7 @@ class CreateRoom extends Component {
             status: 'Matching',
             playerInfo: []
         }
-        axios.post(`${this.socketHost}/newRoom`, {
+        axios.post(`/api/newRoom`, {
             body: data
         }).then((response) => {
             console.log(response);
