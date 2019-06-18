@@ -71,9 +71,9 @@ class JoinRoom extends Component {
             console.log(error);
         });
     }
-    // componentDidUpdate() {
-    //     this.getDataFromDb();
-    // }
+    componentDidUpdate() {
+        this.getDataFromDb();
+    }
 
     componentDidMount() {
         this.getDataFromDb();
