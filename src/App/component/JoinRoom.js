@@ -6,7 +6,8 @@ class JoinRoom extends Component {
         super(props)
         this.state = {
             roomId: [],
-            data: []
+            data: [],
+            load: false
         }
         this.socketHost =
             window.location.hostname === "localhost"
@@ -15,12 +16,12 @@ class JoinRoom extends Component {
         this.mounted = true;
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.JoinRoom = this.JoinRoom.bind(this);
+        this.deleteData = this.deleteData.bind(this);
         this.updateData = this.updateData.bind(this);
-        console.log(this.socketHost);
     }
 
     getDataFromDb() {
-        axios.get(`/api/`, {
+        axios.get(`${this.socketHost}/api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -29,10 +30,22 @@ class JoinRoom extends Component {
             .then((response) => {
                 if (this.mounted) {
                     let room = [];
+                    let data = [];
+                    let deleteroom = [];
                     _.each(response.data, (value) => {
-                        room.push(value.roomId);
+                        if (value.playerInfo.length != 0) {
+                            room.push(value.roomId);
+                            data.push(value);
+                        } else {
+                            deleteroom.push(value.roomId);
+                        }
                     })
-                    this.setState({ data: response.data, roomId: room })
+                    if (deleteroom.length != 0) {
+                        this.deleteData(deleteroom);
+                    } else {
+                        this.setState({ load: true });
+                    }
+                    this.setState({ data, roomId: room })
                 }
             })
             .catch((error) => {
@@ -40,13 +53,37 @@ class JoinRoom extends Component {
             });
     }
 
+    deleteData(roomId) {
+        let count = roomId.length;
+        _.each(roomId, (value) => {
+            axios.post(`${this.socketHost}/api/delete`, {
+                body: value
+            }).then((response) => {
+                count--;
+                if (!count) {
+                    this.setState({ load: true });
+                }
+                console.log(response);
+            }).catch((error) => {
+                console.log(error);
+            });
+        })
+    }
+
     existingRoom() {
+        console.log(this.state);
         let room = [];
-        _.forEach(this.state.data, data => room.push(<button key={`roomId_${data.roomId}`} disabled={data.status == "Matched" ? true : false} className='Room' onClick={this.JoinRoom} roomid={data.roomId} style={{ pointerEvents: (data.status == "Matched") ? "none" : null }}><div>RoomId: {data.roomId}</div><div>{data.CNOP} of {data.NOP} <span style={{ color: "red" }}>"{data.status}"</span></div></button>));
+        if (this.state.roomId.length != 0) {
+            _.forEach(this.state.data, data => room.push(<button key={`roomId_${data.roomId}`} disabled={data.status == "Matched" ? true : false} className='Room' onClick={this.JoinRoom} roomid={data.roomId} style={{ pointerEvents: (data.status == "Matched") ? "none" : null }}><div>RoomId: {data.roomId}</div><div>{data.CNOP} of {data.NOP} <span style={{ color: "red" }}>"{data.status}"</span></div></button>));
+        } else {
+            room.push(<button key={`roomId_${0}`} className='Room'>No Room Available Plz Click to Join</button>);
+        }
         return room;
     }
 
     JoinRoom(e) {
+        let pathName = window.location.pathname;
+        pathName = '';
         const roomId = e.currentTarget.getAttribute('roomid');
         let room = this.state.data;
         let updateData = [];
@@ -59,14 +96,17 @@ class JoinRoom extends Component {
             }
         }
         updateData = { CNOP, NOP, status, ...value };
+        this.props.history.push({
+            pathname: `${pathName}PlayerInfo`,
+            data: updateData
+        })
         this.updateData(updateData);
     }
 
     updateData(updateData) {
-        axios.post(`/api/update`, {
+        axios.post(`${this.socketHost}/api/update`, {
             body: updateData
         }).then((response) => {
-            console.log(response);
         }).catch((error) => {
             console.log(error);
         });
@@ -85,9 +125,12 @@ class JoinRoom extends Component {
     render() {
         return (
             <React.Fragment>
-                <div className='JoinRoomParent'>
+                <div className='JoinRoomParent' style={{ display: this.state.load ? 'block' : 'none' }}>
                     <div className='JoinRoomBody'>Join Room</div>
                     <div className='RoomHolder'>{this.existingRoom()}</div>
+                </div>
+                <div className='loader' style={{ display: !this.state.load ? 'block' : 'none' }}>
+                    <img width='300' height='300' src="https://media.giphy.com/media/kPtmy7oTGcgkBxRzAJ/giphy.gif" />
                 </div>
             </React.Fragment>
         )

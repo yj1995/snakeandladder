@@ -5,12 +5,24 @@ import { Online } from './component/Online';
 import { Start } from './component/Start';
 import { CreateRoom } from './component/CreateRoom';
 import { JoinRoom } from './component/JoinRoom';
+import { PlayerInfo } from './component/PlayerInfo';
+import { waitRoom } from './component/waitRoom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 class Parent extends Component {
   constructor(props) {
     super(props)
     this.handleResize = this.handleResize.bind(this);
+    if (window.performance) {
+      if (performance.navigation.type == 1) {
+        let currentpath = window.location.pathname.split('/');
+        if (currentpath.length === 2) {
+          window.location.pathname = '/';
+        } else {
+          window.location.pathname = `/${currentpath[1]}/`;
+        }
+      }
+    }
   }
 
   handleResize() {
@@ -75,6 +87,8 @@ class Parent extends Component {
             <Route exact path={`${pathName}Offline`} component={Offline} />
             <Route exact path={`${pathName}CreateRoom`} component={CreateRoom} />
             <Route exact path={`${pathName}JoinRoom`} component={JoinRoom} />
+            <Route exact path={`${pathName}PlayerInfo`} component={PlayerInfo} />
+            <Route exact path={`${pathName}waitRoom`} component={waitRoom} />
             <Route exact path={`${pathName}Board`} component={Board} />
           </Switch>
         </BrowserRouter>
@@ -83,11 +97,12 @@ class Parent extends Component {
   }
 
   componentDidMount() {
-    this.handleResize()
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('resize', this.handleResize);
   }
 }
 

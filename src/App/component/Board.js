@@ -37,6 +37,7 @@ class Board extends Component {
     this.drawSnake = this.drawSnake.bind(this);
     this.findLadderAndSnakePresent = this.findLadderAndSnakePresent.bind(this);
     this.currectPlayerStatus = this.currectPlayerStatus.bind(this);
+    console.log(this.userData);
   }
 
   componentDidMount() {
@@ -252,11 +253,13 @@ class Board extends Component {
     if (piece[this.playerChance].position != 100) {
       if (this.playerChance === this.userData.data.length - 1 && this.rollValue != 6 && !ladderPresent) {
         this.playerChance = 0
-      } else if (this.rollValue != 6 && !ladderPresent) {
-        this.playerChance++;
+      } else if (this.rollValue != 6) {
+        if (!ladderPresent) {
+          this.playerChance++;
+        }
       }
     } else {
-      console.log(`Player${this.playerChance} WON`);
+      alert(`Player${this.playerChance} WON`);
       this.PlayerWin[this.playerChance] = 1;
       if (this.playerChance === this.userData.data.length - 1) {
         this.playerChance = 0

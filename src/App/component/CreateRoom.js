@@ -9,7 +9,8 @@ class CreateRoom extends Component {
         this.state = {
             roomId: [],
             data: [],
-            button: []
+            button: [],
+            load: false
         }
         this.noOfPlayer = 0;
         this.socketHost =
@@ -26,16 +27,15 @@ class CreateRoom extends Component {
 
     createRoom(room) {
         const roomId = +room;
-        console.log('roomid');
         this.socket.emit('new-room', roomId);
         this.getDataFromDb(roomId);
     }
 
     checkValidation(e) {
-        console.log('hiii');
         const id = e.target.getAttribute('id');
         const length = document.querySelectorAll('.player').length;
         const input = document.getElementsByClassName('CreateRoomBodyInput')[0];
+        const name = document.getElementsByClassName('CreateRoomBodyInput1')[0];
         if (id) {
             for (let i = 0; i < length; i++) {
                 document.querySelectorAll('.player')[i].style.background = 'white';
@@ -43,12 +43,15 @@ class CreateRoom extends Component {
             document.querySelectorAll('.player')[id - 2].style.background = 'lightblue'
             this.noOfPlayer = +id;
         } else {
-            console.log('create');
             if (input.value.length > 0) {
-                if (this.noOfPlayer != 0) {
-                    this.createRoom(input.value);
+                if (name.value.length > 1) {
+                    if (this.noOfPlayer != 0) {
+                        this.createRoom(input.value);
+                    } else {
+                        alert('Plz select no of players');
+                    }
                 } else {
-                    alert('Plz select no of players');
+                    alert('Plz enter name value greater then 2');
                 }
             } else {
                 alert('Plz enter room no');
@@ -75,7 +78,8 @@ class CreateRoom extends Component {
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
-        axios.get(`/api/`, {
+        this.setState({ load: true });
+        axios.get(`${this.socketHost}/api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -89,15 +93,18 @@ class CreateRoom extends Component {
             for (let i = 0; i < room.length; i++) {
                 if (room[i] == roomId) {
                     result = false;
+                    break;
                 }
             }
             if (result) {
-                this.setState({ data: response.data, roomId: room })
+                this.setState({ data: response.data, roomId: room });
                 this.postData(roomId);
             } else {
+                this.setState({ data: response.data, roomId: room, load: false });
                 alert(`ALREADY USED ROOMID:${roomId}. PLZ USE DIFFERENT ROOMID`);
                 document.getElementsByClassName('CreateRoomBodyInput')[0].value = '';
-                for (let i = 0; i < length; i++) {
+                document.getElementsByClassName('CreateRoomBodyInput1')[0].value = '';
+                for (let i = 0; i < document.querySelectorAll('.player').length; i++) {
                     document.querySelectorAll('.player')[i].style.background = 'white';
                 }
                 this.noOfPlayer = 0;
@@ -108,17 +115,31 @@ class CreateRoom extends Component {
     }
 
     postData(roomId) {
-        const data = {
+        let pathName = window.location.pathname;
+        const name = document.getElementsByClassName('CreateRoomBodyInput1')[0].value;
+        pathName = '';
+        let value = {
+            name,
+            color: 'red',
+            inital: name[0].toUpperCase() + name[1].toUpperCase(),
+            admin: 0
+        }
+        let data = {
             roomId: roomId,
             NOP: this.noOfPlayer,
             CNOP: 1,
             status: 'Matching',
             playerInfo: []
         }
-        axios.post(`/api/newRoom`, {
+        data.playerInfo.push(value);
+        axios.post(`${this.socketHost}/api/newRoom`, {
             body: data
         }).then((response) => {
-            console.log(response);
+            this.props.history.push({
+                pathname: `${pathName}waitRoom`,
+                data,
+                name
+            })
         }).catch((error) => {
             console.log(error);
         });
@@ -127,9 +148,11 @@ class CreateRoom extends Component {
     render() {
         return (
             <React.Fragment>
-                <div className='CreateRoomParent'>
-                    <div className='CreateRoomBody'>Create Room</div>
-                    <input className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" ></input>
+                <div className='CreateRoomParent' style={{ display: this.state.load ? 'none' : 'block' }}>
+                    <div className='CreateRoomBody'>Player Info</div>
+                    <input className='CreateRoomBodyInput1' placeholder="Enter Name" minLength="2"></input>
+                    <div className='CreateRoomBody'>Room Info</div>
+                    <input pattern="^[0-9]" min="0" className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" type='number'></input>
                     <div className='buttonHolder'>
                         <div className='Title'>Select No of Players</div>
                         {this.state.button}
@@ -137,6 +160,9 @@ class CreateRoom extends Component {
                     <div>
                         <button onClick={this.checkValidation} className='createButton'>CREATE</button>
                     </div>
+                </div>
+                <div className='loader' style={{ display: this.state.load ? 'block' : 'none' }}>
+                    <img width='300' height='300' src="https://media.giphy.com/media/kPtmy7oTGcgkBxRzAJ/giphy.gif" />
                 </div>
             </React.Fragment>
         )

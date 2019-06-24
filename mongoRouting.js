@@ -11,7 +11,7 @@ const options = {
     autoIndex: false, // Don't build indexes
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     reconnectInterval: 500, // Reconnect every 500ms
-    poolSize: 10, // Maintain up to 10 socket connections
+    poolSize: 10000, // Maintain up to 10 socket connections
     // If not connected, return errors immediately rather than waiting for reconnect
     bufferMaxEntries: 0,
     connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
@@ -19,13 +19,11 @@ const options = {
     family: 4 // Use IPv4, skip trying IPv6
 };
 // const client = new MongoClient(url, options);
-console.log('dsasadg');
 router.get('/', (req, res, next) => {
     let resultArray = [];
     mongoose.connect(url, options, function (err, db) {
         assert.equal(null, err);
         let cursor = db.collection('room').find();
-        console.log(cursor);
         cursor.forEach((doc, err) => {
             assert.equal(null, err);
             resultArray.push(doc);
@@ -54,7 +52,8 @@ router.post('/update', (req, res, next) => {
         let id = req.body.body.roomId;
         let set = {
             CNOP: req.body.body.CNOP,
-            status: req.body.body.status
+            status: req.body.body.status,
+            playerInfo: req.body.body.playerInfo,
         };
         let cursor = db.collection('room');
         cursor.updateOne({ "roomId": id }, { $set: set }, (err, result) => {
@@ -68,7 +67,8 @@ router.post('/update', (req, res, next) => {
 router.post('/delete', (req, res, next) => {
     mongoose.connect(url, options, function (err, db) {
         assert.equal(null, err);
-        let id = req.body.body.roomId;
+        let id = req.body.body;
+        console.log(req.body.body);
         let cursor = db.collection('room');
         cursor.deleteOne({ "roomId": id }, (err, result) => {
             assert.equal(null, err);

@@ -14,11 +14,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", router);
 
 if (process.env.NODE_ENV === 'production') {
-    console.log('dsaygsdah');
     app.disable("x-powered-by")
     app.use(logger("common"));
     app.use(express.static(path.resolve(__dirname, './dist')));
-    console.log(path.resolve(__dirname, './dist', 'index.html'));
     app.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, './dist', 'index.html'));
     })
