@@ -75,6 +75,9 @@ class CreateRoom extends Component {
                 roomId
             })
         });
+        this.socket.on('update', (data) => {
+            console.log('data', data);
+        })
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
@@ -135,6 +138,7 @@ class CreateRoom extends Component {
         axios.post(`${this.socketHost}/api/newRoom`, {
             body: data
         }).then((response) => {
+            this.socket.emit('new-player', { data: data.playerInfo[data.playerInfo.length - 1], mySocketId: data.playerInfo.length - 1 });
             this.props.history.push({
                 pathname: `${pathName}waitRoom`,
                 data,
@@ -150,9 +154,9 @@ class CreateRoom extends Component {
             <React.Fragment>
                 <div className='CreateRoomParent' style={{ display: this.state.load ? 'none' : 'block' }}>
                     <div className='CreateRoomBody'>Player Info</div>
-                    <input className='CreateRoomBodyInput1' placeholder="Enter Name" minLength="2"></input>
+                    <input className='CreateRoomBodyInput1' placeholder="Enter Name" minLength="2" maxLength="8"></input>
                     <div className='CreateRoomBody'>Room Info</div>
-                    <input pattern="^[0-9]" min="0" className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" type='number'></input>
+                    <input onInput={function () { if (document.getElementsByClassName('CreateRoomBodyInput')[0].value.length > 6) document.getElementsByClassName('CreateRoomBodyInput')[0].value = document.getElementsByClassName('CreateRoomBodyInput')[0].value.slice(0, 6); }} min="0" className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" type='number'></input>
                     <div className='buttonHolder'>
                         <div className='Title'>Select No of Players</div>
                         {this.state.button}

@@ -35,15 +35,18 @@ class waitRoom extends Component {
                             data = value;
                         }
                     })
-                    this.setState({ data, load: true })
-                    if (data.CNOP === data.NOP) {
-                        setTimeout(() => {
+
+                    console.log(+data.CNOP === +data.NOP);
+                    if (+data.CNOP === +data.NOP) {
+                        this.setState({ data, load: true }, () => {
                             this.props.history.push({
                                 pathname: `${pathName}Board`,
                                 data: data.playerInfo,
                                 name: this.props.location.name
                             })
-                        }, 3000)
+                        })
+                    } else {
+                        this.setState({ data, load: true })
                     }
                 }
             })

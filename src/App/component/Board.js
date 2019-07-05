@@ -4,9 +4,10 @@ import { Piece } from './Piece';
 import _ from 'lodash';
 import { TweenMax } from "gsap/TweenMax";
 import ReactDice from 'react-dice-complete';
-import json from '../game.json'
+import json from '../game.json';
 import 'react-dice-complete/dist/react-dice-complete.css';
 import { Ladder } from './Ladder&Snake';
+import openSocket from 'socket.io-client';
 
 class Board extends Component {
   constructor(props) {
@@ -27,6 +28,11 @@ class Board extends Component {
     this.state = {
       piece: [],
     }
+    this.socketHost =
+      window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : window.location.hostname;
+    this.socket = openSocket(this.socketHost);
     this.setTile = this.setTile.bind(this);
     this.rollDice = this.rollDice.bind(this);
     this.setTilePosition = this.setTilePosition.bind(this);
@@ -37,7 +43,6 @@ class Board extends Component {
     this.drawSnake = this.drawSnake.bind(this);
     this.findLadderAndSnakePresent = this.findLadderAndSnakePresent.bind(this);
     this.currectPlayerStatus = this.currectPlayerStatus.bind(this);
-    console.log(this.userData);
   }
 
   componentDidMount() {
@@ -46,6 +51,9 @@ class Board extends Component {
     this.drawLadder();
     this.drawSnake();
     this.setPiece();
+    this.socket.on(`update`, (data) => {
+      console.log(data, 'gasdhj');
+    })
   }
 
   setTilePosition() {
@@ -204,7 +212,9 @@ class Board extends Component {
           TweenMax.to(piece[this.playerChance], 0.5,
             {
               scale: 1,
-              onUpdate: () => this.setState({ piece }),
+              onUpdate: () => {
+                this.socket.emit('movement', { position: piece[this.playerChance], mySocketId: this.playerChance }); this.setState({ piece })
+              },
               onComplete: () => {
                 this.currectPlayerStatus(piece);
                 document.querySelector('.diceParent').style['pointer-events'] = 'auto';
@@ -262,9 +272,25 @@ class Board extends Component {
       alert(`Player${this.playerChance} WON`);
       this.PlayerWin[this.playerChance] = 1;
       if (this.playerChance === this.userData.data.length - 1) {
-        this.playerChance = 0
+        for (let i = 0; i < this.userData.data.length; i++) {
+          if (this.PlayerWin[this.playerChance] != 1) {
+            this.playerChance = i;
+            break;
+          }
+        }
       } else {
         this.playerChance++;
+        if (this.PlayerWin[this.playerChance] == 1) {
+          this.playerChance++;
+          if (this.playerChance === this.userData.data.length - 1) {
+            for (let i = 0; i < this.userData.data.length; i++) {
+              if (this.PlayerWin[this.playerChance] != 1) {
+                this.playerChance = i;
+                break;
+              }
+            }
+          }
+        }
       }
     }
     this.setState({ piece });

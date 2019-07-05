@@ -24,10 +24,25 @@ if (process.env.NODE_ENV === 'production') {
 const port = process.env.PORT || 3000;
 http.listen(port, () => console.log(`Server started on port ${port}`));
 
+const player = {};
+
 io.on('connection', function (socket) {
     socket.on('new-room', function (msg) {
         io.emit('created-room', msg);
     })
-    socket.on('disconnect', function (msg) {
+    socket.on('new-player', function (info) {
+        const { data, mySocketId } = info;
+        player[mySocketId] = data;
+        io.sockets.emit('update', player);
+    })
+    socket.on('movement', function (info) {
+        const { data, mySocketId } = info;
+        var player = player[mySocketId] || {};
+        player.position = data;
+        io.sockets.emit('update', player);
+    })
+    socket.on('disconnect', function (info) {
+        const { mySocketId, ...values } = info;
+        delete player[mySocketId];
     });
 })

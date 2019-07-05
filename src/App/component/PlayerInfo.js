@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import openSocket from 'socket.io-client';
 import './style.less';
 
 class PlayerInfo extends Component {
@@ -12,6 +13,7 @@ class PlayerInfo extends Component {
             window.location.hostname === "localhost"
                 ? "http://localhost:3000"
                 : window.location.hostname;
+        this.socket = openSocket(this.socketHost);
         this.playerData = this.playerData.bind(this);
     }
 
@@ -57,6 +59,7 @@ class PlayerInfo extends Component {
                 axios.post(`${this.socketHost}/api/update`, {
                     body: player
                 }).then((response) => {
+                    this.socket.emit('new-player', { data: player.playerInfo[player.playerInfo.length - 1], mySocketId: player.playerInfo.length - 1 });
                     this.props.history.push({
                         pathname: `${pathName}waitRoom`,
                         data: player,
@@ -70,13 +73,20 @@ class PlayerInfo extends Component {
             });
         }
     }
+
+    componentDidMount() {
+        this.socket.on('update', (data) => {
+            console.log('data', data);
+        })
+    }
+
     render() {
         return (
             <React.Fragment>
                 <div className='CreateRoomParent' style={{ display: this.state.load ? 'none' : 'block' }}>
                     <div className='CreateRoomBody'>PlayerInfo</div>
                     <div className='CreateRoomBody' style={{ fontSize: 50 }}>Enter Player Name</div>
-                    <input className='CreateRoomBodyInput' placeholder="Enter Name" minLength="2"></input>
+                    <input className='CreateRoomBodyInput' placeholder="Enter Name" minLength="2" maxLength="8"></input>
                     <div>
                         <button onClick={this.playerData} className='createButton'>Done</button>
                     </div>

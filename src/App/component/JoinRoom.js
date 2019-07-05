@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import openSocket from 'socket.io-client';
 
 class JoinRoom extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class JoinRoom extends Component {
                 ? "http://localhost:3000"
                 : window.location.hostname;
         this.mounted = true;
+        this.socket = openSocket(this.socketHost);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.JoinRoom = this.JoinRoom.bind(this);
         this.deleteData = this.deleteData.bind(this);
