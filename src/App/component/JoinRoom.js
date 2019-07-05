@@ -23,7 +23,7 @@ class JoinRoom extends Component {
     }
 
     getDataFromDb() {
-        axios.get(`${this.socketHost}/api/`, {
+        axios.get(`api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -58,7 +58,7 @@ class JoinRoom extends Component {
     deleteData(roomId) {
         let count = roomId.length;
         _.each(roomId, (value) => {
-            axios.post(`${this.socketHost}/api/delete`, {
+            axios.post(`api/delete`, {
                 body: value
             }).then((response) => {
                 count--;
@@ -106,7 +106,7 @@ class JoinRoom extends Component {
     }
 
     updateData(updateData) {
-        axios.post(`${this.socketHost}/api/update`, {
+        axios.post(`api/update`, {
             body: updateData
         }).then((response) => {
         }).catch((error) => {

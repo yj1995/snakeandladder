@@ -21,7 +21,7 @@ class waitRoom extends Component {
     getDataFromDb() {
         let pathName = window.location.pathname;
         pathName = '';
-        axios.get(`${this.socketHost}/api/`, {
+        axios.get(`api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
