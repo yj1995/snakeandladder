@@ -44,8 +44,8 @@ io.on('connection', function (socket) {
         if (player[mySocketId] != undefined) {
             if (newRoom) {
                 player = {};
-                player[mySocketId] = data;
             }
+            player[mySocketId] = data;
         } else {
             player[mySocketId] = data;
         }
