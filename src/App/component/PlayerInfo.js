@@ -30,7 +30,7 @@ class PlayerInfo extends Component {
             document.getElementsByClassName('CreateRoomBodyInput')[0].value = '';
         } else {
             this.setState({ load: true });
-            axios.get(`${this.socketHost}/api/`, {
+            axios.get(`api/`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
@@ -50,7 +50,7 @@ class PlayerInfo extends Component {
                 }
                 playerInfo.push(infoData);
                 player = { playerInfo, ...value };
-                axios.post(`${this.socketHost}/api/update`, {
+                axios.post(`api/update`, {
                     body: player
                 }).then((response) => {
                     pathName = "";

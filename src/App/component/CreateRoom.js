@@ -81,7 +81,7 @@ class CreateRoom extends Component {
     }
     getDataFromDb(roomId) {
         this.setState({ load: true });
-        axios.get(`${this.socketHost}/api/`, {
+        axios.get(`api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -136,7 +136,7 @@ class CreateRoom extends Component {
             start: false
         }
         data.playerInfo.push(value);
-        axios.post(`${this.socketHost}/api/newRoom`, {
+        axios.post(`api/newRoom`, {
             body: data
         }).then((response) => {
             socket.emit('new-player', { data: data.playerInfo[data.playerInfo.length - 1], mySocketId: data.playerInfo.length - 1, room: roomId });
