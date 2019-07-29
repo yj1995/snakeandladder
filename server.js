@@ -39,9 +39,12 @@ io.on('connection', function (socket) {
         io.emit('joined', msg);
     })
     socket.on(`new-player`, function (info) {
-        const { data, mySocketId, room } = info;
+        const { data, mySocketId, room, newRoom } = info;
         if (player[mySocketId] != undefined) {
-            player[mySocketId] = data;
+            if (newRoom) {
+                player = {};
+                player[mySocketId] = data;
+            }
         } else {
             player[mySocketId] = data;
         }

@@ -145,7 +145,8 @@ class CreateRoom extends Component {
                 data,
                 admin: data.playerInfo.length - 1,
                 socket: socket,
-                room: data.roomId
+                room: data.roomId,
+                newRoom: true
             })
         }).catch((error) => {
             console.log(error);
