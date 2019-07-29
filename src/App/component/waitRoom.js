@@ -39,17 +39,16 @@ class waitRoom extends Component {
                     document.getElementById(id).setAttribute('disabled', true);
                 }
             })
-            this.setState({ load: false, data: storeData });
-            socket.emit('new-player', { data: storeData[+id], mySocketId: +id, room: +this.userData.room });
-            // this.postData(storeData);
+           
         } else {
             storeData[+id].state = true;
             storeData[+id].chance = true;
             this.setState({ load: false, data: storeData });
-            socket.emit('new-player', { data: storeData[+id], mySocketId: +id, room: +this.userData.room });
-            document.getElementById(id).setAttribute('disabled', true);
-            // this.postData(storeData);
         }
+        console.log(storeData[+id],'storeData[+id]',+id);
+         this.setState({ load: false, data: storeData });
+         socket.emit('new-player', { data: storeData[+id], mySocketId: +id, room: +this.userData.room });
+         // this.postData(storeData);
     }
 
     componentDidMount() {
