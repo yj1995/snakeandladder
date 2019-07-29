@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import { Square } from './Square';
 import { Piece } from './Piece';
+import { socket } from '../Parent';
 import _ from 'lodash';
 import { TweenMax } from "gsap/TweenMax";
 import ReactDice from 'react-dice-complete';
-import json from '../game.json'
+import json from '../game.json';
 import 'react-dice-complete/dist/react-dice-complete.css';
 import { Ladder } from './Ladder&Snake';
 
-class Board extends Component {
+class boardServer extends Component {
   constructor(props) {
     super(props)
+    window.display = this;
     this.PlayerWin = [];
     this.userData = this.props.location;
     this.firstDiceRollBool = false;
@@ -25,8 +27,8 @@ class Board extends Component {
     this.tile = [];
     this.playerChance = 0;
     this.state = {
-      piece: [],
-    }
+      piece: []
+    };
     this.setTile = this.setTile.bind(this);
     this.rollDice = this.rollDice.bind(this);
     this.setTilePosition = this.setTilePosition.bind(this);
@@ -37,11 +39,18 @@ class Board extends Component {
     this.drawSnake = this.drawSnake.bind(this);
     this.findLadderAndSnakePresent = this.findLadderAndSnakePresent.bind(this);
     this.currectPlayerStatus = this.currectPlayerStatus.bind(this);
-    console.log(this.userData);
   }
 
   componentDidMount() {
     this.setTilePosition();
+    socket.on(`${this.userData.room}_movement`, (data) => {
+      let dataArr = Object.keys(data).map(function (key) {
+        return data[key];
+      });
+      this.setState({ piece: dataArr });
+      this.playerChance = _.findIndex(this.state.piece, (data) => { return data.chance == true });
+
+    })
     this.setTile();
     this.drawLadder();
     this.drawSnake();
@@ -49,6 +58,7 @@ class Board extends Component {
   }
 
   setTilePosition() {
+    socket.emit('movement', { data: this.userData.data, room: +this.userData.room });
     let x = 0;
     let y = 0;
     for (let i = json.board.row - 1; i >= 0; i--) {
@@ -100,6 +110,7 @@ class Board extends Component {
   setTile() {
     let count = 101;
     let row = 0;
+    socket.emit('new-player', { data: this.userData.data[this.userData.data.length - 1], mySocketId: this.userData.data.length - 1, room: +this.userData.room });
     this.tilePosition.forEach((val, index) => {
       row++;
       this.tilePosition[index].forEach((val, index) => {
@@ -189,13 +200,14 @@ class Board extends Component {
             }
           })
         }
+        piece[this.playerChance].position += this.rollValue;
       }
     }
 
     square.forEach((val, index) => {
       square[index].forEach((val, index) => {
         if (!piece[this.playerChance].first && this.rollValue === 6 && val.row === 10 && val.point === 1) {
-          ++piece[this.playerChance].position;
+          piece[this.playerChance].position = 1;
           sixBool = true;
           document.querySelector('.overlayer').style.background = 'rgba(158, 158, 158, 0)';
           document.querySelector('.overlayer').style.opacity = 0;
@@ -204,7 +216,11 @@ class Board extends Component {
           TweenMax.to(piece[this.playerChance], 0.5,
             {
               scale: 1,
-              onUpdate: () => this.setState({ piece }),
+              onUpdate: () => {
+                socket.emit('movement', {
+                  data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+                });
+              },
               onComplete: () => {
                 this.currectPlayerStatus(piece);
                 document.querySelector('.diceParent').style['pointer-events'] = 'auto';
@@ -215,12 +231,15 @@ class Board extends Component {
         } else if (piece[this.playerChance].first && path.length) {
           document.querySelector('.overlayer').style.background = 'rgba(158, 158, 158, 0)';
           document.querySelector('.overlayer').style.opacity = 0;
-          TweenMax.to(piece[this.playerChance], 1.5, {
+          TweenMax.to(piece[this.playerChance], 2, {
             ease: SteppedEase.config(path.length),
             bezier: { values: path },
-            onUpdate: () => this.setState({ piece }),
+            onUpdate: () => {
+              socket.emit('movement', {
+                data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+              });
+            },
             onComplete: () => {
-              piece[this.playerChance].position += this.rollValue;
               ladderPresent = _.find(json.ladder, obj => (obj.start === piece[this.playerChance].position));
               SnakePresent = _.find(json.snake, obj => (obj.start === piece[this.playerChance].position));
               if (ladderPresent || SnakePresent) {
@@ -251,20 +270,42 @@ class Board extends Component {
 
   currectPlayerStatus(piece, ladderPresent = false) {
     if (piece[this.playerChance].position != 100) {
-      if (this.playerChance === this.userData.data.length - 1 && this.rollValue != 6 && !ladderPresent) {
-        this.playerChance = 0
+      if (this.playerChance === this.state.piece.length - 1 && this.rollValue != 6 && !ladderPresent) {
+        this.playerChance = 0;
+        socket.emit('movement', {
+          data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+        });
       } else if (this.rollValue != 6) {
         if (!ladderPresent) {
-          this.playerChance++;
+          ++this.playerChance;
+          socket.emit('movement', {
+            data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+          });
         }
       }
     } else {
       alert(`Player${this.playerChance} WON`);
       this.PlayerWin[this.playerChance] = 1;
       if (this.playerChance === this.userData.data.length - 1) {
-        this.playerChance = 0
+        for (let i = 0; i < this.userData.data.length; i++) {
+          if (this.PlayerWin[this.playerChance] != 1) {
+            this.playerChance = i;
+            break;
+          }
+        }
       } else {
         this.playerChance++;
+        if (this.PlayerWin[this.playerChance] == 1) {
+          this.playerChance++;
+          if (this.playerChance === this.userData.data.length - 1) {
+            for (let i = 0; i < this.userData.data.length; i++) {
+              if (this.PlayerWin[this.playerChance] != 1) {
+                this.playerChance = i;
+                break;
+              }
+            }
+          }
+        }
       }
     }
     this.setState({ piece });
@@ -276,25 +317,37 @@ class Board extends Component {
     piece[this.playerChance].position = latestPosition;
     const currectValue = _.find(this.tile, obj => obj.props.id === latestPosition).props;
     if (value === 'ladder') {
-      TweenMax.to(piece[this.playerChance], 1.5, {
+      TweenMax.to(piece[this.playerChance], 2, {
         x: currectValue.x + (json.square.size / 8.5),
         y: currectValue.y + (json.square.size / 8.5),
-        onUpdate: () => this.setState({ piece }),
+        onUpdate: () => {
+          socket.emit('movement', {
+            data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+          });
+        },
         onComplete: () => {
           this.currectPlayerStatus(piece, value === 'ladder' ? true : false)
           document.querySelector('.diceParent').style['pointer-events'] = 'auto';
         }
       })
     } else {
-      TweenMax.to(piece[this.playerChance], 1, {
+      TweenMax.to(piece[this.playerChance], 2, {
         scale: 0,
-        onUpdate: () => this.setState({ piece }),
+        onUpdate: () => {
+          socket.emit('movement', {
+            data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+          });
+        },
         onComplete: () => {
           piece[this.playerChance].x = currectValue.x + (json.square.size / 8.5);
           piece[this.playerChance].y = currectValue.y + (json.square.size / 8.5);
-          TweenMax.to(piece[this.playerChance], 1, {
+          TweenMax.to(piece[this.playerChance], 2, {
             scale: 1,
-            onUpdate: () => this.setState({ piece }),
+            onUpdate: () => {
+              socket.emit('movement', {
+                data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+              });
+            },
             onComplete: () => {
               this.currectPlayerStatus(piece, value === 'ladder' ? true : false);
               document.querySelector('.diceParent').style['pointer-events'] = 'auto';
@@ -321,14 +374,14 @@ class Board extends Component {
           <div className='player' style={{ position: json.board.position }}>
             {this.setPiecePosition()}
           </div>
-          <div className='overlayer' style={{ position: json.diceParent.position, width: json.square.size * 10, height: json.square.size * 10, background: 'rgba(158,158,158,0.8)', zIndex: 1000, opacity: 1 }}>
+          <div className='overlayer' style={{ position: json.diceParent.position, width: json.square.size * 10, height: json.square.size * 10, background: 'rgba(158,158,158,0.8)', zIndex: 1000, display: this.state.piece.length ? (this.state.piece[this.userData.admin].chance ? 'block' : 'none') : 'none' }}>
             <div className='diceParent' style={{ position: json.diceParent.position, left: '50%', top: '50%', transform: 'translate(-50%,-50%)', fontSize: 30, fontFamily: 'monospace', color: 'white', textAlign: 'center' }}>
-              <div>Player:{this.userData.data[this.playerChance].name}</div>
-              <div>SixCount:{this.sixCount[this.playerChance]}</div>
-              <div>LadderCount:{this.ladderClimb[this.playerChance]}</div>
-              <div>SnakeCount:{this.snakeBite[this.playerChance]}</div>
+              <div>Player:{this.userData.data[this.userData.admin].name}</div>
+              <div>SixCount:{this.sixCount[this.userData.admin]}</div>
+              <div>LadderCount:{this.ladderClimb[this.userData.admin]}</div>
+              <div>SnakeCount:{this.snakeBite[this.userData.admin]}</div>
               <ReactDice
-                rollDone={this.rollDoneCallback} numDice={1} faceColor={this.userData.data[this.playerChance].color} dotColor={json.diceParent.dotColor}
+                rollDone={this.rollDoneCallback} numDice={1} faceColor={this.userData.data[this.userData.admin].color} dotColor={json.diceParent.dotColor}
                 ref={dice => this.reactDice = dice} rollTime={0.2}
               />
             </div>
@@ -339,4 +392,4 @@ class Board extends Component {
   }
 }
 
-export { Board }
+export { boardServer }

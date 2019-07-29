@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import openSocket from 'socket.io-client';
 import axios from 'axios';
 import './style.less';
+import { socket } from '../Parent';
 
 class CreateRoom extends Component {
     constructor(props) {
@@ -17,7 +17,6 @@ class CreateRoom extends Component {
             window.location.hostname === "localhost"
                 ? "http://localhost:3000"
                 : window.location.hostname;
-        this.socket = openSocket(this.socketHost);
         this.createRoom = this.createRoom.bind(this);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.createNoOfPlayerButton = this.createNoOfPlayerButton.bind(this);
@@ -27,7 +26,7 @@ class CreateRoom extends Component {
 
     createRoom(room) {
         const roomId = +room;
-        this.socket.emit('new-room', roomId);
+        socket.emit('new-room', roomId);
         this.getDataFromDb(roomId);
     }
 
@@ -68,21 +67,21 @@ class CreateRoom extends Component {
     }
 
     componentDidMount() {
-        this.socket.on('created-room', (msg) => {
-            const roomId = this.state.roomId;
+        const roomId = this.state.roomId;
+        socket.on('created-room', (msg) => {
             roomId.push(msg);
             this.setState({
                 roomId
             })
         });
-        this.socket.on('update', (data) => {
+        socket.on(`${roomId}_new-player`, (data) => {
             console.log('data', data);
         })
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
         this.setState({ load: true });
-        axios.get(`api/`, {
+        axios.get(`${this.socketHost}/api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -125,24 +124,28 @@ class CreateRoom extends Component {
             name,
             color: 'red',
             inital: name[0].toUpperCase() + name[1].toUpperCase(),
-            admin: 0
+            admin: 0,
+            state: false
         }
         let data = {
-            roomId: roomId,
+            roomId,
             NOP: this.noOfPlayer,
             CNOP: 1,
             status: 'Matching',
-            playerInfo: []
+            playerInfo: [],
+            start: false
         }
         data.playerInfo.push(value);
-        axios.post(`api/newRoom`, {
+        axios.post(`${this.socketHost}/api/newRoom`, {
             body: data
         }).then((response) => {
-            this.socket.emit('new-player', { data: data.playerInfo[data.playerInfo.length - 1], mySocketId: data.playerInfo.length - 1 });
+            socket.emit('new-player', { data: data.playerInfo[data.playerInfo.length - 1], mySocketId: data.playerInfo.length - 1, room: roomId });
             this.props.history.push({
                 pathname: `${pathName}waitRoom`,
                 data,
-                name
+                admin: data.playerInfo.length - 1,
+                socket: socket,
+                room: data.roomId
             })
         }).catch((error) => {
             console.log(error);

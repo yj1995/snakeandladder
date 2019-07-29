@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import openSocket from 'socket.io-client';
+import { socket } from '../Parent';
 import './style.less';
 
 class PlayerInfo extends Component {
     constructor(props) {
         super(props)
+        this.userData = this.props.location;
         this.state = {
-            load: false
+            load: false,
+            socket: this.userData.socket
         }
+        console.log(socket);
         this.socketHost =
             window.location.hostname === "localhost"
                 ? "http://localhost:3000"
                 : window.location.hostname;
-        this.socket = openSocket(this.socketHost);
         this.playerData = this.playerData.bind(this);
     }
 
@@ -28,42 +30,37 @@ class PlayerInfo extends Component {
             document.getElementsByClassName('CreateRoomBodyInput')[0].value = '';
         } else {
             this.setState({ load: true });
-            axios.get(`api/`, {
+            axios.get(`${this.socketHost}/api/`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             }).then((response) => {
                 let player = _.find(response.data, (value) => {
-                    return +this.props.location.data.roomId === value.roomId;
+                    return +this.userData.room === value.roomId;
                 })
+                console.log(player, this.userData.room);
                 let { playerInfo, ...value } = player;
-                if (playerInfo == undefined) {
-                    let value = {
-                        name: playerName,
-                        color: color[playerInfo.length],
-                        inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
-                        admin: playerInfo.length
-                    }
-                    playerInfo.push(value);
-                } else {
-                    let value = {
-                        name: playerName,
-                        color: color[playerInfo.length],
-                        inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
-                        admin: playerInfo.length
-                    }
-                    playerInfo.push(value);
+                let infoData = {
+                    name: playerName,
+                    color: color[playerInfo.length],
+                    inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
+                    admin: playerInfo.length,
+                    state: false
                 }
+                playerInfo.push(infoData);
                 player = { playerInfo, ...value };
-                axios.post(`api/update`, {
+                axios.post(`${this.socketHost}/api/update`, {
                     body: player
                 }).then((response) => {
-                    this.socket.emit('new-player', { data: player.playerInfo[player.playerInfo.length - 1], mySocketId: player.playerInfo.length - 1 });
+                    pathName = "";
+                    socket.emit(`new-player`, { data: player.playerInfo[player.playerInfo.length - 1], mySocketId: player.playerInfo.length - 1, room: +this.userData.room });
                     this.props.history.push({
                         pathname: `${pathName}waitRoom`,
                         data: player,
-                        name: playerName
+                        admin: playerInfo.length - 1,
+                        room: +this.userData.room,
+                        socket: socket
                     })
                 }).catch((error) => {
                     console.log(error);
@@ -75,7 +72,7 @@ class PlayerInfo extends Component {
     }
 
     componentDidMount() {
-        this.socket.on('update', (data) => {
+        socket.on(`${this.userData.room}_new-player`, (data) => {
             console.log('data', data);
         })
     }

@@ -28,21 +28,44 @@ const player = {};
 
 io.on('connection', function (socket) {
     socket.on('new-room', function (msg) {
+        socket.join(msg);
         io.emit('created-room', msg);
     })
-    socket.on('new-player', function (info) {
-        const { data, mySocketId } = info;
-        player[mySocketId] = data;
-        io.sockets.emit('update', player);
+    socket.on('joining', function (msg) {
+        var room = io.nsps['/'].adapter.rooms[`${msg}`];
+        if (room && room.length == 1) {
+            socket.join(room);
+        }
+        io.emit('joined', msg);
     })
-    socket.on('movement', function (info) {
-        const { data, mySocketId } = info;
-        var player = player[mySocketId] || {};
-        player.position = data;
-        io.sockets.emit('update', player);
+    socket.on(`new-player`, function (info) {
+        const { data, mySocketId, room } = info;
+        if (player[mySocketId] != undefined) {
+            player[mySocketId] = data;
+        } else {
+            player[mySocketId] = data;
+        }
+        io.emit(`${room}_new-player`, player);
+    })
+    socket.on(`movement`, function (info) {
+        const { data, mySocketId, room } = info;
+        if (Object.keys(player).length == 0) {
+            data.forEach((element, i) => {
+                player[i] = element;
+            });
+        } else if (typeof (mySocketId) == 'number') {
+            player[mySocketId] = data;
+            Object.keys(player).forEach((val) => {
+                if (+val != +mySocketId) {
+                    player[val].chance = false;
+                } else {
+                    player[val].chance = true;
+                }
+            })
+        }
+        io.emit(`${room}_movement`, player);
     })
     socket.on('disconnect', function (info) {
-        const { mySocketId, ...values } = info;
-        delete player[mySocketId];
+        console.log('user disconnected');
     });
 })
