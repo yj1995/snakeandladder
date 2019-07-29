@@ -139,14 +139,18 @@ class CreateRoom extends Component {
         axios.post(`api/newRoom`, {
             body: data
         }).then((response) => {
-            socket.emit('new-player', { data: data.playerInfo[data.playerInfo.length - 1], mySocketId: data.playerInfo.length - 1, room: roomId });
+            socket.emit('new-player', {
+                data: data.playerInfo[data.playerInfo.length - 1],
+                mySocketId: data.playerInfo.length - 1,
+                room: roomId,
+                newRoom: true
+            });
             this.props.history.push({
                 pathname: `${pathName}waitRoom`,
                 data,
                 admin: data.playerInfo.length - 1,
                 socket: socket,
-                room: data.roomId,
-                newRoom: true
+                room: data.roomId
             })
         }).catch((error) => {
             console.log(error);

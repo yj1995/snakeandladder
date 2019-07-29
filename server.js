@@ -40,6 +40,7 @@ io.on('connection', function (socket) {
     })
     socket.on(`new-player`, function (info) {
         const { data, mySocketId, room, newRoom } = info;
+        console.log(newRoom);
         if (player[mySocketId] != undefined) {
             if (newRoom) {
                 player = {};
