@@ -1,5 +1,5 @@
 # game
-[click here to play](https://yj1995.github.io/snakeandladder/)
+[click here to play](https://snakeandladder.herokuapp.com/)
 
 ## Snake and Ladder
 The purpose is to make snake and ladder game in react-dom.
