@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import openSocket from 'socket.io-client';
 import axios from 'axios';
 import './style.less';
+import { socket } from '../Parent';
 
 class CreateRoom extends Component {
     constructor(props) {
@@ -17,7 +17,6 @@ class CreateRoom extends Component {
             window.location.hostname === "localhost"
                 ? "http://localhost:3000"
                 : window.location.hostname;
-        this.socket = openSocket(this.socketHost);
         this.createRoom = this.createRoom.bind(this);
         this.getDataFromDb = this.getDataFromDb.bind(this);
         this.createNoOfPlayerButton = this.createNoOfPlayerButton.bind(this);
@@ -27,7 +26,7 @@ class CreateRoom extends Component {
 
     createRoom(room) {
         const roomId = +room;
-        this.socket.emit('new-room', roomId);
+        socket.emit('new-room', roomId);
         this.getDataFromDb(roomId);
     }
 
@@ -68,18 +67,21 @@ class CreateRoom extends Component {
     }
 
     componentDidMount() {
-        this.socket.on('created-room', (msg) => {
-            const roomId = this.state.roomId;
+        const roomId = this.state.roomId;
+        socket.on('created-room', (msg) => {
             roomId.push(msg);
             this.setState({
                 roomId
             })
         });
+        socket.on(`${roomId}_new-player`, (data) => {
+            console.log('data', data);
+        })
         this.createNoOfPlayerButton();
     }
     getDataFromDb(roomId) {
         this.setState({ load: true });
-        axios.get(`${this.socketHost}/api/`, {
+        axios.get(`api/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -122,23 +124,33 @@ class CreateRoom extends Component {
             name,
             color: 'red',
             inital: name[0].toUpperCase() + name[1].toUpperCase(),
-            admin: 0
+            admin: 0,
+            state: false
         }
         let data = {
-            roomId: roomId,
+            roomId,
             NOP: this.noOfPlayer,
             CNOP: 1,
             status: 'Matching',
-            playerInfo: []
+            playerInfo: [],
+            start: false
         }
         data.playerInfo.push(value);
-        axios.post(`${this.socketHost}/api/newRoom`, {
+        axios.post(`api/newRoom`, {
             body: data
         }).then((response) => {
+            socket.emit('new-player', {
+                data: data.playerInfo[data.playerInfo.length - 1],
+                mySocketId: data.playerInfo.length - 1,
+                room: roomId,
+                newRoom: true
+            });
             this.props.history.push({
                 pathname: `${pathName}waitRoom`,
                 data,
-                name
+                admin: data.playerInfo.length - 1,
+                socket: socket,
+                room: data.roomId
             })
         }).catch((error) => {
             console.log(error);
@@ -150,9 +162,9 @@ class CreateRoom extends Component {
             <React.Fragment>
                 <div className='CreateRoomParent' style={{ display: this.state.load ? 'none' : 'block' }}>
                     <div className='CreateRoomBody'>Player Info</div>
-                    <input className='CreateRoomBodyInput1' placeholder="Enter Name" minLength="2"></input>
+                    <input className='CreateRoomBodyInput1' placeholder="Enter Name" minLength="2" maxLength="8"></input>
                     <div className='CreateRoomBody'>Room Info</div>
-                    <input pattern="^[0-9]" min="0" className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" type='number'></input>
+                    <input onInput={function () { if (document.getElementsByClassName('CreateRoomBodyInput')[0].value.length > 6) document.getElementsByClassName('CreateRoomBodyInput')[0].value = document.getElementsByClassName('CreateRoomBodyInput')[0].value.slice(0, 6); }} min="0" className='CreateRoomBodyInput' placeholder="Enter Room ID" maxLength="6" type='number'></input>
                     <div className='buttonHolder'>
                         <div className='Title'>Select No of Players</div>
                         {this.state.button}

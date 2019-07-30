@@ -39,7 +39,8 @@ class Offline extends Component {
     _.each(color, (obj, index) => completeDetails[index].color = obj.value != 'select the piece color' ? obj.value : 'black');
     this.props.history.push({
       pathname: `${pathName}Board`,
-      data: completeDetails // your data array of objects
+      data: completeDetails, // your data array of objects
+      offline: true
     })
   }
   createDetailBox(value) {

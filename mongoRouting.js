@@ -54,6 +54,7 @@ router.post('/update', (req, res, next) => {
             CNOP: req.body.body.CNOP,
             status: req.body.body.status,
             playerInfo: req.body.body.playerInfo,
+            start: req.body.body.start
         };
         let cursor = db.collection('room');
         cursor.updateOne({ "roomId": id }, { $set: set }, (err, result) => {

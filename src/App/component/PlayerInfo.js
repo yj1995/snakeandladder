@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { socket } from '../Parent';
 import './style.less';
 
 class PlayerInfo extends Component {
     constructor(props) {
         super(props)
+        this.userData = this.props.location;
         this.state = {
-            load: false
+            load: false,
+            socket: this.userData.socket
         }
+        console.log(socket);
         this.socketHost =
             window.location.hostname === "localhost"
                 ? "http://localhost:3000"
@@ -26,41 +30,37 @@ class PlayerInfo extends Component {
             document.getElementsByClassName('CreateRoomBodyInput')[0].value = '';
         } else {
             this.setState({ load: true });
-            axios.get(`${this.socketHost}/api/`, {
+            axios.get(`api/`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             }).then((response) => {
                 let player = _.find(response.data, (value) => {
-                    return +this.props.location.data.roomId === value.roomId;
+                    return +this.userData.room === value.roomId;
                 })
+                console.log(player, this.userData.room);
                 let { playerInfo, ...value } = player;
-                if (playerInfo == undefined) {
-                    let value = {
-                        name: playerName,
-                        color: color[playerInfo.length],
-                        inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
-                        admin: playerInfo.length
-                    }
-                    playerInfo.push(value);
-                } else {
-                    let value = {
-                        name: playerName,
-                        color: color[playerInfo.length],
-                        inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
-                        admin: playerInfo.length
-                    }
-                    playerInfo.push(value);
+                let infoData = {
+                    name: playerName,
+                    color: color[playerInfo.length],
+                    inital: playerName[0].toUpperCase() + playerName[1].toUpperCase(),
+                    admin: playerInfo.length,
+                    state: false
                 }
+                playerInfo.push(infoData);
                 player = { playerInfo, ...value };
-                axios.post(`${this.socketHost}/api/update`, {
+                axios.post(`api/update`, {
                     body: player
                 }).then((response) => {
+                    pathName = "";
+                    socket.emit(`new-player`, { data: player.playerInfo[player.playerInfo.length - 1], mySocketId: player.playerInfo.length - 1, room: +this.userData.room });
                     this.props.history.push({
                         pathname: `${pathName}waitRoom`,
                         data: player,
-                        name: playerName
+                        admin: playerInfo.length - 1,
+                        room: +this.userData.room,
+                        socket: socket
                     })
                 }).catch((error) => {
                     console.log(error);
@@ -70,13 +70,20 @@ class PlayerInfo extends Component {
             });
         }
     }
+
+    componentDidMount() {
+        socket.on(`${this.userData.room}_new-player`, (data) => {
+            console.log('data', data);
+        })
+    }
+
     render() {
         return (
             <React.Fragment>
                 <div className='CreateRoomParent' style={{ display: this.state.load ? 'none' : 'block' }}>
                     <div className='CreateRoomBody'>PlayerInfo</div>
                     <div className='CreateRoomBody' style={{ fontSize: 50 }}>Enter Player Name</div>
-                    <input className='CreateRoomBodyInput' placeholder="Enter Name" minLength="2"></input>
+                    <input className='CreateRoomBodyInput' placeholder="Enter Name" minLength="2" maxLength="8"></input>
                     <div>
                         <button onClick={this.playerData} className='createButton'>Done</button>
                     </div>

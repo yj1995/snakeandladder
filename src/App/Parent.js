@@ -6,8 +6,11 @@ import { Start } from './component/Start';
 import { CreateRoom } from './component/CreateRoom';
 import { JoinRoom } from './component/JoinRoom';
 import { PlayerInfo } from './component/PlayerInfo';
+import { boardServer } from './component/boardServer';
+import openSocket from 'socket.io-client';
 import { waitRoom } from './component/waitRoom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+const socket = openSocket(window.location.hostname === "localhost" ? "http://localhost:3000" : window.location.hostname);
 
 class Parent extends Component {
   constructor(props) {
@@ -16,7 +19,7 @@ class Parent extends Component {
     if (window.performance) {
       if (performance.navigation.type == 1) {
         let currentpath = window.location.pathname.split('/');
-        if (currentpath.length === 2) {
+        if (currentpath.length > 1) {
           window.location.pathname = '/';
         } else {
           window.location.pathname = `/${currentpath[1]}/`;
@@ -83,13 +86,14 @@ class Parent extends Component {
         <BrowserRouter>
           <Switch>
             <Route exact path={`${pathName}`} component={Start} />
-            <Route exact path={`${pathName}Online`} component={Online} />
-            <Route exact path={`${pathName}Offline`} component={Offline} />
-            <Route exact path={`${pathName}CreateRoom`} component={CreateRoom} />
-            <Route exact path={`${pathName}JoinRoom`} component={JoinRoom} />
-            <Route exact path={`${pathName}PlayerInfo`} component={PlayerInfo} />
-            <Route exact path={`${pathName}waitRoom`} component={waitRoom} />
-            <Route exact path={`${pathName}Board`} component={Board} />
+            <Route path={`${pathName}Online`} component={Online} />
+            <Route path={`${pathName}Offline`} component={Offline} />
+            <Route path={`${pathName}CreateRoom`} component={CreateRoom} />
+            <Route path={`${pathName}JoinRoom`} component={JoinRoom} />
+            <Route path={`${pathName}PlayerInfo`} component={PlayerInfo} />
+            <Route path={`${pathName}waitRoom`} component={waitRoom} />
+            <Route path={`${pathName}boardServer`} component={boardServer} />
+            <Route path={`${pathName}Board`} component={Board} />
           </Switch>
         </BrowserRouter>
       </div>
@@ -106,4 +110,4 @@ class Parent extends Component {
   }
 }
 
-export { Parent };
+export { Parent, socket };
