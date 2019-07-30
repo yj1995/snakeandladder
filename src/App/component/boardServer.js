@@ -169,7 +169,7 @@ class boardServer extends Component {
     if (this.firstDiceRollBool) {
       document.querySelector('.diceParent').style['pointer-events'] = 'none';
       this.rollValue = num;
-      this.rollDice();
+      setTimeout(this.rollDice, 300);
     }
     this.firstDiceRollBool = true;
   }
@@ -284,31 +284,21 @@ class boardServer extends Component {
         }
       }
     } else {
-      alert(`Player${this.playerChance} WON`);
-      this.PlayerWin[this.playerChance] = 1;
-      if (this.playerChance === this.userData.data.length - 1) {
-        for (let i = 0; i < this.userData.data.length; i++) {
-          if (this.PlayerWin[this.playerChance] != 1) {
-            this.playerChance = i;
-            break;
-          }
+      if (!this.PlayerWin[this.playerChance]) {
+        this.PlayerWin[this.playerChance] = 1;
+        alert(`${this.PlayerWin.length} Position : Player${this.playerChance}`);
+        if (this.PlayerWin.length == this.state.piece.length - 1) {
+          this.props.history.push({
+            pathname: '/'
+          })
         }
       } else {
-        this.playerChance++;
-        if (this.PlayerWin[this.playerChance] == 1) {
-          this.playerChance++;
-          if (this.playerChance === this.userData.data.length - 1) {
-            for (let i = 0; i < this.userData.data.length; i++) {
-              if (this.PlayerWin[this.playerChance] != 1) {
-                this.playerChance = i;
-                break;
-              }
-            }
-          }
-        }
+        ++this.playerChance;
+        socket.emit('movement', {
+          data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+        });
       }
     }
-    this.setState({ piece });
     document.querySelector('.overlayer').style.background = 'rgba(158, 158, 158, 0.8)';
     document.querySelector('.overlayer').style.opacity = 1;
   }

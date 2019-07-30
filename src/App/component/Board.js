@@ -158,7 +158,7 @@ class Board extends Component {
     if (this.firstDiceRollBool) {
       document.querySelector('.diceParent').style['pointer-events'] = 'none';
       this.rollValue = num;
-      this.rollDice();
+      setTimeout(this.rollDice, 300);
     }
     this.firstDiceRollBool = true;
   }
@@ -259,12 +259,16 @@ class Board extends Component {
         }
       }
     } else {
-      alert(`Player${this.playerChance} WON`);
-      this.PlayerWin[this.playerChance] = 1;
-      if (this.playerChance === this.userData.data.length - 1) {
-        this.playerChance = 0
+      if (!this.PlayerWin[this.playerChance]) {
+        this.PlayerWin[this.playerChance] = 1;
+        alert(`${this.PlayerWin.length} Position : ${this.userData.data[this.playerChance].name}`);
+        if (this.PlayerWin.length == this.state.piece.length - 1) {
+          this.props.history.push({
+            pathname: '/'
+          })
+        }
       } else {
-        this.playerChance++;
+        ++this.playerChance;
       }
     }
     this.setState({ piece });
