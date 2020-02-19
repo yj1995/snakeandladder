@@ -133,7 +133,8 @@ class Board extends Component {
         x: json.Piece.width - (json.Piece.size + ((json.Piece.size + 5) * i)),
         y: json.Piece.Inty,
         scale: 0,
-        position: 0
+        position: 0,
+        PlayerWin: 0
       })
       this.sixCount[i] = 0;
       this.ladderClimb[i] = 0;
@@ -158,7 +159,9 @@ class Board extends Component {
     if (this.firstDiceRollBool) {
       document.querySelector('.diceParent').style['pointer-events'] = 'none';
       this.rollValue = num;
-      setTimeout(this.rollDice, 300);
+      _.defer(() => {
+        this.rollDice();
+      })
     }
     this.firstDiceRollBool = true;
   }
@@ -259,10 +262,16 @@ class Board extends Component {
         }
       }
     } else {
-      if (!this.PlayerWin[this.playerChance]) {
-        this.PlayerWin[this.playerChance] = 1;
-        alert(`${this.PlayerWin.length} Position : ${this.userData.data[this.playerChance].name}`);
-        if (this.PlayerWin.length == this.state.piece.length - 1) {
+      if (!piece[this.playerChance].PlayerWin) {
+        piece[this.playerChance].PlayerWin = 1;
+        PlayerWin = 0;
+        piece.forEach((val) => {
+          if (val.PlayerWin) {
+            PlayerWin++;
+          }
+        })
+        alert(`${PlayerWin} Position : ${piece[this.playerChance].name}`);
+        if (PlayerWin == this.state.piece.length - 1) {
           this.props.history.push({
             pathname: '/'
           })
@@ -333,7 +342,7 @@ class Board extends Component {
               <div>SnakeCount:{this.snakeBite[this.playerChance]}</div>
               <ReactDice
                 rollDone={this.rollDoneCallback} numDice={1} faceColor={this.userData.data[this.playerChance].color} dotColor={json.diceParent.dotColor}
-                ref={dice => this.reactDice = dice} rollTime={0.2}
+                ref={dice => this.reactDice = dice} rollTime={0.15}
               />
             </div>
           </div>

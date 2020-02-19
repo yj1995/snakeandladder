@@ -13,7 +13,6 @@ class boardServer extends Component {
   constructor(props) {
     super(props)
     window.display = this;
-    this.PlayerWin = [];
     this.userData = this.props.location;
     this.firstDiceRollBool = false;
     this.ladder = [];
@@ -49,7 +48,8 @@ class boardServer extends Component {
       });
       this.setState({ piece: dataArr });
       this.playerChance = _.findIndex(this.state.piece, (data) => { return data.chance == true });
-
+      document.querySelector('.overlayer').style.background = 'rgba(158, 158, 158, 0.8)';
+      document.querySelector('.overlayer').style.opacity = 1;
     })
     this.setTile();
     this.drawLadder();
@@ -144,7 +144,8 @@ class boardServer extends Component {
         x: json.Piece.width - (json.Piece.size + ((json.Piece.size + 5) * i)),
         y: json.Piece.Inty,
         scale: 0,
-        position: 0
+        position: 0,
+        PlayerWin: 0
       })
       this.sixCount[i] = 0;
       this.ladderClimb[i] = 0;
@@ -169,7 +170,9 @@ class boardServer extends Component {
     if (this.firstDiceRollBool) {
       document.querySelector('.diceParent').style['pointer-events'] = 'none';
       this.rollValue = num;
-      setTimeout(this.rollDice, 300);
+      _.defer(() => {
+        this.rollDice();
+      })
     }
     this.firstDiceRollBool = true;
   }
@@ -272,35 +275,36 @@ class boardServer extends Component {
     if (piece[this.playerChance].position != 100) {
       if (this.playerChance === this.state.piece.length - 1 && this.rollValue != 6 && !ladderPresent) {
         this.playerChance = 0;
-        socket.emit('movement', {
-          data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
-        });
       } else if (this.rollValue != 6) {
         if (!ladderPresent) {
           ++this.playerChance;
-          socket.emit('movement', {
-            data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
-          });
         }
       }
     } else {
-      if (!this.PlayerWin[this.playerChance]) {
-        this.PlayerWin[this.playerChance] = 1;
-        alert(`${this.PlayerWin.length} Position : Player${this.playerChance}`);
-        if (this.PlayerWin.length == this.state.piece.length - 1) {
+      if (!piece[this.playerChance].PlayerWin) {
+        piece[this.playerChance].PlayerWin = 1;
+        PlayerWin = 0;
+        piece.forEach((val) => {
+          if (val.PlayerWin) {
+            PlayerWin++;
+          }
+        })
+        alert(`${PlayerWin} Position : ${piece[this.playerChance].name}`);
+        if (PlayerWin == piece.length - 1) {
+          socket.emit('movement', {
+            data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+          });
           this.props.history.push({
             pathname: '/'
           })
         }
       } else {
         ++this.playerChance;
-        socket.emit('movement', {
-          data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
-        });
       }
     }
-    document.querySelector('.overlayer').style.background = 'rgba(158, 158, 158, 0.8)';
-    document.querySelector('.overlayer').style.opacity = 1;
+    socket.emit('movement', {
+      data: piece[this.playerChance], mySocketId: this.playerChance, room: +this.props.location.room
+    });
   }
 
   findLadderAndSnakePresent(latestPosition, piece, value) {
@@ -372,7 +376,7 @@ class boardServer extends Component {
               <div>SnakeCount:{this.snakeBite[this.userData.admin]}</div>
               <ReactDice
                 rollDone={this.rollDoneCallback} numDice={1} faceColor={this.userData.data[this.userData.admin].color} dotColor={json.diceParent.dotColor}
-                ref={dice => this.reactDice = dice} rollTime={0.2}
+                ref={dice => this.reactDice = dice} rollTime={0.15}
               />
             </div>
           </div>
