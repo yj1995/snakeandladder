@@ -9,7 +9,9 @@
     "build": "webpack",
     "dev": "webpack-dev-server",
     "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "proxy": "http://127.0.0.1:3000",
   "keywords": [
@@ -40,7 +42,8 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "webpack-hot-middleware": "^2.25.0",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -60,5 +63,6 @@
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
-  }
+  },
+  "snyk": true
 }
