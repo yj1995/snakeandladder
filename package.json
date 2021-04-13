@@ -18,7 +18,7 @@
   "author": "yash",
   "license": "MIT",
   "dependencies": {
-    "autoprefixer": "^9.7.4",
+    "autoprefixer": "^10.0.0",
     "axios": "^0.18.1",
     "body-parser": "^1.19.0",
     "concurrently": "^5.0.1",
