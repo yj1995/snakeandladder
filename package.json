@@ -9,7 +9,9 @@
     "build": "webpack",
     "dev": "webpack-dev-server",
     "build:prod": "webpack -p && cp src/app/index.html dist/app/index.html",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "proxy": "http://127.0.0.1:3000",
   "keywords": [
@@ -19,28 +21,29 @@
   "license": "MIT",
   "dependencies": {
     "autoprefixer": "^9.7.4",
-    "axios": "^0.18.1",
+    "axios": "^0.21.3",
     "body-parser": "^1.19.0",
     "concurrently": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "gsap": "^2.1.3",
+    "gsap": "^3.6.0",
     "http": "0.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mongodb": "^3.5.3",
-    "mongoose": "^5.9.1",
+    "mongoose": "^5.13.15",
     "morgan": "^1.9.1",
-    "nodemon": "^1.19.4",
+    "nodemon": "^2.0.17",
     "react": "^16.12.0",
     "react-dice-complete": "^1.2.0",
     "react-dom": "^16.12.0",
     "react-dropdown": "^1.6.4",
     "react-lineto": "^3.1.3",
     "react-router-dom": "^5.1.2",
-    "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0",
-    "webpack-hot-middleware": "^2.25.0",
-    "webpack-node-externals": "^1.7.2"
+    "socket.io": "^3.0.0",
+    "socket.io-client": "^2.4.0",
+    "webpack-hot-middleware": "^2.25.1",
+    "webpack-node-externals": "^1.7.2",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -60,5 +63,6 @@
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
-  }
+  },
+  "snyk": true
 }
